@@ -1,0 +1,3 @@
+[submodule "src/assets/backgrounds"]
+	path = src/assets/backgrounds
+	url = git@github.com:queer/m-bg.git

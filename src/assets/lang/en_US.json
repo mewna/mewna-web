@@ -1,0 +1,110 @@
+{
+  "settings": {
+    "general": "Welcome messages, prefix, join role, and more.",
+    "economy": "Change the currency symbol and toggle commands.",
+    "levels": "Chat levels, role rewards, and level-up messages.",
+    "notifications": "Twitch notifications and more.",
+    "music": "Queuing and playing music.",
+    "misc": "Anything that doesn't fit in the other categories.",
+    "updates": {
+      "enabled": "enabled",
+      "disabled": "disabled",
+      "toggle": "Toggled \"$setting\" from $old to $new.",
+      "change": "Changed \"$setting\" from \"$old\" to \"$new\".",
+      "big-update": "Updated \"$setting\".",
+      "invalid": "Invalid config!",
+      "added": "Added \"$thing\".",
+      "removed": "Removed \"$thing\"."
+    },
+    "desc": {
+      "none": "None",
+      "message-variables": "Message variables (click to reveal)",
+      "discord-mentions": "How to mention channels and use emojis (click to reveal)",
+      "format-vars": {
+        "server-name": "The name of the server.",
+        "server-region": "The voice region the server uses.",
+        "user-name": "The user's name.",
+        "user-discriminator": "The 4 numbers after the user's name (does NOT include the #).",
+        "user-mention": "Pings the user.",
+        "user-bot": "true if the user is a bot, false otherwise.",
+        "stream": {
+          "link": "The link to the stream.",
+          "streamer-name": "The streamer's username.",
+          "stream-title": "The stream's title.",
+          "stream-viewers": "The number of people watching the stream when the notification was sent."
+        },
+        "levels": {
+          "level": "The level that the user reached.",
+          "xp": "How much EXP the user has."
+        }
+      },
+      "format-discord": {
+        "channel": "To mention a channel, type \\#channel from the desktop or web client. You'll see something like \"<#23876431289732423>\". Copy/paste that into the textbox.",
+        "emoji": "To mention a channel, type \\:emoji: from the desktop or web client. You'll see something like \"<:emojiName:23876431289732423>\". Copy/paste that into the textbox."
+      },
+      "general": {
+        "join-role": "The role Mewna assigns to everyone who joins your server. Choose @everyone to clear it.",
+        "prefix": "The prefix Mewna uses for commands. The default is mew., meaning that commands are run as mew.command. A prefix of ! would let you run commands as !command instead."
+      },
+      "levels": {
+        "mee6-import": "Import this server's levels and role rewards from MEE6. This overwrites old levels and cannot be undone. This may take several minutes to run.",
+        "role-chooser": "Select a role from the dropdown to add it as a reward.",
+        "level": "Level"
+      },
+      "notifications": {
+        "webhooks": "Webhooks are used to send Twitch stream notifications and server blog post notifications to your server.",
+        "twitch": "Type a name in the search box to search for a Twitch streamer to add."
+      }
+    }
+  },
+  "levels": {
+    "role-rewards": "Role Rewards",
+    "how-it-works": "How Levels Work",
+    "no-rewards": "This server has no role rewards set up.",
+    "view-rank": "You can view your rank with $prefixrank.",
+    "exp-gain": "You gain a random amount of exp 10 and 25 per message. To prevent spamming, you can only gain exp once per minute."
+  },
+  "commands": {
+    "economy": {
+      "balance": "Check your balance, or someone else's balance.",
+      "pay": "Send money to another user.",
+      "daily": "Collect some money once a day.",
+      "crime": "Shake down some people for some money.",
+      "heist": "Execute a daring raid on the impenetrable Fort Knick-Knacks.",
+      "slots": "Gamble your life away at the slot machines.",
+      "baltop": "See the 10 richest users.",
+      "gamble": "Bet big on the Wumpus Races.",
+      "items": "View your items.",
+      "market": "Show available items.",
+      "buy": "Buy some items.",
+      "sell": "Sell some items.",
+      "mine": "Go mining for shines!",
+      "fish": "Go fishing for tasty fish!",
+      "box": "View and open some mystery boxes!"
+    },
+    "emotes": "Fun little emote commands. You need to mention someone to use them.",
+    "levels": {
+      "rank": "Check your rank, or someone else's rank.",
+      "profile": "Check your profile card, or someone else's.",
+      "score": "Check your score, or someone else's.",
+      "leaderboards": "View the server leaderboards."
+    },
+    "misc": {
+      "cat": "Get a random cat picture.",
+      "dog": "Get a random dog picture.",
+      "catgirl": "Get a random (SFW) catgirl picture.",
+      "rubeface": "Rubeface, the perfect meme for every situation.",
+      "memetext": "Convert stuff to big characters.",
+      "snowman": "Do you want to build a snowman?",
+      "bootlegcat": "See a bootleg cat, for when mew.cat doesn't work.",
+      "clappify": "👏 Clap 👏 some 👏 text 👏 (or 🍞, or 🥔, whatever)",
+      "help": "Get links to helpful information.",
+      "roll": "Roll some dice, D&D style.",
+      "chargen": "Generate 6 stats for a D&D character.",
+      "ping": "Check if Mewna's still working.",
+      "page": "Get the link to this server's page.",
+      "tato": "Mewna Miner - Like Cookie Clicker, but tato-flavoured.",
+      "dnd": "Get useful information for your D&D 5e game."
+    }
+  }
+}
