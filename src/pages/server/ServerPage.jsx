@@ -85,11 +85,13 @@ export default withToastManager(class extends Component {
 
   async updateConfig(data, callback) {
     if(typeof window !== undefined) {
-      const response = await api.updateGuildConfig(api.clientHostname(), this.props.match.params.id, this.state.config)
+      const host = api.clientHostname()
+      const response = await api.updateGuildConfig(host, this.props.match.params.id, this.state.config)
+      const rewards = await api.guildRewards(host, this.props.match.params.id)
       if(response.errors) {
         error(this, $("en_US", "settings.updates.invalid"))
       } else {
-        this.setState({config: data}, async () => callback())
+        this.setState({config: data, rewards: rewards}, async () => callback())
       }
     }
   }

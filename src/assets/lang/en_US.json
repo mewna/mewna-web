@@ -18,6 +18,7 @@
     },
     "desc": {
       "none": "None",
+      "clear-value": "Clear value",
       "message-variables": "Message variables (click to reveal)",
       "discord-mentions": "How to mention channels and use emojis (click to reveal)",
       "format-vars": {

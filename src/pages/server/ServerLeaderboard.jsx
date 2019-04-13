@@ -4,11 +4,12 @@ import regeneratorRuntime from "regenerator-runtime"
 import { PaddedCard } from "../../comp/Card"
 import SideCard from "../../comp/profile/SideCard"
 import FlexPadder from "../../comp/FlexPadder"
-import Grid, { ProfileGrid } from "../../comp/GridContainer"
+import Grid, { ProfileGrid, SideGrid } from "../../comp/GridContainer"
 import { SmallIcon } from "../../comp/profile/Icon"
 import NavLink from "../../comp/NavLink"
 import { darkBackground, brandBackground, lightBackground } from "../../comp/Utils"
 import lookupBackground from "../../Backgrounds"
+import groupBy from "lodash.groupby"
 
 import styled from "@emotion/styled"
 import Axios from "axios";
@@ -16,6 +17,7 @@ import $ from "../../Translate";
 import Container from "../../comp/Container"
 import storage from "../../Storage"
 import getTheme from "../../Theme"
+import FlexContainer, {DefaultFlexContainer} from "../../comp/FlexContainer";
 
 const LeaderboardGrid = styled(Grid)`
   width: 100%;
@@ -26,14 +28,19 @@ const LeaderboardGrid = styled(Grid)`
   grid-row-gap: 2em;
   grid-auto-rows: fit-content(80px);
 `
-const SideGrid = styled(Grid)`
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: fit-content(16em);
-  grid-column-gap: 2em;
-  grid-row-gap: 2em;
-  grid-auto-rows: fit-content(16em);
+const RolePill = styled.span`
+  height: 1.5em;
+  border-radius: 0.75em;
+  padding: 2px;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin: 4px;
+  margin-left: 0;
+  margin-right: 6px;
+  border-style: solid;
+  border-width: 2px;
+  box-sizing: border-box;
+  white-space: nowrap;
 `
 
 export default class extends Component {
@@ -68,9 +75,38 @@ export default class extends Component {
         </div>
       )
     } else {
+      const cards = []
+      let key = 0
+      const groups = groupBy(this.props.rewards, "level")
+      Object.keys(groups).forEach(level => {
+        const roles = groups[level]
+        const roleTexts = []
+        roles.forEach(obj => {
+          const { role } = obj
+          const name = role.name
+          let color = role.color.toString(16)
+          if(color === "1fffffff") {
+            color = "ffffff"
+          }
+          color = "#" + color
+          roleTexts.push(
+            <RolePill key={key++} style={{color: color, borderColor: color}}>
+              {name}
+            </RolePill>
+          )
+        })
+        cards.push(
+          <div key={key++}>
+            <strong>{$("en_US", "settings.desc.levels.level")} {level}</strong>
+            <DefaultFlexContainer style={{flexWrap: "wrap"}}>
+              {roleTexts}
+            </DefaultFlexContainer>
+          </div>
+        )
+      })
       return (
         <div>
-          TODO: Fill this out...
+          {cards}
         </div>
       )
     }
@@ -83,13 +119,10 @@ export default class extends Component {
       const levelProgress = e.nextLevelXp - e.currentLevelXp - e.xpNeeded
       const levelTotal = e.userXp - e.currentLevelXp + e.xpNeeded
       const background = lookupBackground(e.customBackground)
-      const FilledRankCard = styled(RankCard)`
-        background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("${background}") center / cover;
-      `
       const dashOffset = 200.96 * (1 - (levelProgress / levelTotal))
       const theme = getTheme(storage.getLightTheme())
       cards.push(
-        <FilledRankCard key={key++}>
+        <RankCard key={key++} style={{background: `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("${background}") center / cover`}}>
           <RankNumber>
             #{e.playerRank}
           </RankNumber>
@@ -119,7 +152,7 @@ export default class extends Component {
               {e.userLevel}
             </ProgressBarMobileText>
           </ProgressBarMobile>
-        </FilledRankCard>
+        </RankCard>
       )
     })
     return cards

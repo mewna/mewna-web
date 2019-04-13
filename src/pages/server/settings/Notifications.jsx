@@ -13,7 +13,7 @@ import DeleteButton from "../../../comp/DeleteButton"
 import regeneratorRuntime from "regenerator-runtime"
 import { success, toggleState } from "../../../Utils"
 import { withToastManager } from 'react-toast-notifications'
-import { AsyncSelect } from "../../../comp/Select"
+import Select, { AsyncSelect } from "../../../comp/Select"
 import debounce from "debounce-promise"
 import styled from "@emotion/styled"
 import axios from "axios"
@@ -43,6 +43,17 @@ export default withToastManager(class extends Component {
   }
 
   render() {
+    const channelOptions = this.props.cache.webhooks.map(e => {
+        const channel = this.props.cache.channels.filter(c => c.id === e.channel)
+        let name = $("en_US", "settings.desc.none")
+        if(channel[0]) {
+          name = channel[0].name
+        }
+        return {value: e.channel, label: "#" + name}
+      })
+      .sort((a, b) => (a.label.toLowerCase() > b.label.toLowerCase()) ? 1 : ((b.label.toLowerCase() > a.label.toLowerCase()) ? -1 : 0))
+    channelOptions.push({value: -1, label: $("en_US", "settings.desc.clear-value")})
+
     return (
       <>
         <GridContainer>
@@ -60,6 +71,36 @@ export default withToastManager(class extends Component {
         </GridContainer>
         <InterGridSpacer />
         <GridContainer>
+          <PaddedCard>
+            <h4>Twitch notification webhook</h4>
+            <InternalWidthFixer>
+              <Select
+                isSearchable={false}
+                options={channelOptions}
+                classname="Select-container"
+                classNamePrefix="Select"
+                onChange={(option, actionObj) => {
+                  const { label, value } = option
+                  const oldChannel = this.props.config.twitch.twitchWebhookChannel
+                  const newChannel = value
+                  let config = Object.assign({}, this.props.config)
+                  config.twitch.twitchWebhookChannel = value === -1 ? null : newChannel
+                  this.props.updateConfig(config, () => {
+                    const oldName = oldChannel ? "#" + this.props.cache.channels.filter(e => e.id === oldChannel)[0].name : $("en_US", "settings.desc.none")
+                    const newName = newChannel && newChannel !== -1 ? "#" + this.props.cache.channels.filter(e => e.id === newChannel)[0].name : $("en_US", "settings.desc.none")
+                    success(
+                      this,
+                      $("en_US", "settings.updates.change")
+                        .replace("$setting", "Twitch notification webhook")
+                        .replace("$old", oldName)
+                        .replace("$new", newName)
+                    )
+                  })
+                }}
+                value={channelOptions.filter(e => e.value === this.props.config.twitch.twitchWebhookChannel)}
+              />
+            </InternalWidthFixer>
+          </PaddedCard>
           <PaddedCard>
             <FlexContainer>
               <div>

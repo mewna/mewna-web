@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 
-export default styled.div`
+const Grid = styled.div`
   width: 100%;
   display: grid;
   grid-template-columns: 1fr;
@@ -13,6 +13,7 @@ export default styled.div`
     grid-template-columns: 1fr;
   }
 `
+export default Grid
 
 export const FourColGrid = styled.div`
   width: 100%;
@@ -76,4 +77,14 @@ export const ProfileGrid = styled.div`
   @media screen and (max-width: 768px) {
     grid-template-columns: 1fr;
   }
+`
+
+export const SideGrid = styled(Grid)`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: min-content;
+  grid-column-gap: 2em;
+  grid-row-gap: 2em;
+  grid-auto-rows: min-content;
 `
