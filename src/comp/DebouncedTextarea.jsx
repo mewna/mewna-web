@@ -25,11 +25,9 @@ export default class DebouncedTextarea extends Component {
     this.maxChars = this.props.maxChars ? this.props.maxChars : MAX_CHARS
 
     if (props.callback) {
-      this.handleChangeInternal = debounce(500, false, this.props.callback)
+      this.handleChangeInternal = debounce(1500, false, this.props.callback)
     } else {
-      this.handleChangeInternal = debounce(500, false, e =>
-        this.getLogger().debug("target ::", e)
-      )
+      this.handleChangeInternal = debounce(1500, false, e => {})
     }
 
     this.state = {
