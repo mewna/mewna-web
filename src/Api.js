@@ -110,6 +110,36 @@ class Api {
     }
   }
 
+  async guildInfo(hostname, guild) {
+    try {
+      if(hostname) {
+        const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/info`)
+        return out.data
+      } else {
+        return {}
+      }
+    } catch(e) {
+      return {}
+    }
+  }
+
+  async updateGuildInfo(hostname, guild, data) {
+    try {
+      if(hostname && this.token()) {
+        const out = await axios.post(`${backendUrl(hostname)}/api/guild/${guild}/info`, data, {
+          headers: {
+            "Authorization": this.token()
+          }
+        })
+        return out.data
+      } else {
+        return {}
+      }
+    } catch(e) {
+      return {}
+    }
+  }
+
   async guildWebhooks(hostname, guild) {
     try {
       if(hostname && this.token()) {

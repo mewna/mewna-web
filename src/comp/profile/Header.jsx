@@ -97,20 +97,38 @@ export const ProfileIcon = styled(BaseProfileIcon)`
     left: calc(50vw - 64px);
   }
 `
-export const ProfileName = styled.div`
-  position: absolute;
-  top: -2em;
-  left: 7.25em;
+export const ProfileName = styled.span`
   font-size: 1.5em;
   padding: 4px;
   border-radius: 2px;
   ${hoverBackground}
+
+  @media screen and (min-width: 769px) {
+    margin-right: 0.5em;
+  }
 
   @media screen and (max-width: 768px) {
     width: 50vw;
     top: -4em;
     left: calc(50vw - 25vw);
     text-align: center;
+  }
+`
+export const ProfileNameWrapper = styled.div`
+  display: flex;
+  position: absolute;
+  text-align: center;
+  
+  @media screen and (min-width: 769px) {
+    flex-direction: row;
+    top: -3em;
+    left: 10em;
+  }
+
+  @media screen and (max-width: 768px) {
+    top: -7em;
+    text-align: center;
+    flex-direction: column;
   }
 `
 

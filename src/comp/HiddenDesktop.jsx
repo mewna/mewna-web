@@ -3,19 +3,19 @@ import styled from "@emotion/styled"
 export default comp => {
   return styled(comp)`
     @media screen and (max-width: 768px) {
-      display: none !important;
+      display: flex !important;
     }
     @media screen and (min-width: 769px) {
-      display: flex !important;
+      display: none !important;
     }
   `
 }
 
-export const HiddenMobile = styled.div`
+export const HiddenDesktop = styled.div`
   @media screen and (max-width: 768px) {
-    display: none !important;
+    display: flex !important;
   }
   @media screen and (min-width: 769px) {
-    display: flex !important;
+    display: none !important;
   }
 `

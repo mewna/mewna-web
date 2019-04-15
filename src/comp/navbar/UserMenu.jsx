@@ -5,6 +5,8 @@ import FlexPadder from "../FlexPadder"
 import { NavMenuButton } from "./NavButton"
 import store from "../../Storage"
 import api from "../../Api"
+import { HiddenDesktop } from "../HiddenDesktop"
+import NavLink from "../NavLink"
 
 const Holder = styled.div`
   display: flex;
@@ -41,6 +43,11 @@ const Avatar = styled.img`
   border-radius: 50%;
   margin-right: 0.25em;
 `
+const TextHolder = styled.div`
+  max-width: calc(10em - 24px - 0.25em);
+  text-overflow: ellipsis;
+  overflow: hidden;
+`
 const Arrow = styled.div`
   border-left: ${props => props.expanded ? "5px" : "5px"} solid transparent;
   border-right: ${props => props.expanded ? "5px" : "5px"} solid transparent;
@@ -69,12 +76,12 @@ class UserMenu extends Component {
   }
 
   toggleTheme() {
-    store.setLightTheme(!store.getLightTheme())
+    store.setLightTheme(!store.getLightTheme(), window.location.hostname)
   }
 
   logout() {
     api.logout(api.clientHostname())
-    store.setToken(null)
+    store.setToken(null, window.location.hostname)
   }
 
   renderMenu() {
@@ -82,6 +89,18 @@ class UserMenu extends Component {
       return (
         <Menu>
           <NavMenuButton onClick={() => this.toggleTheme()} nounderline="true">Change theme</NavMenuButton>
+          <HiddenDesktop style={{display: "flex", flexDirection: "column"}}>
+            <NavMenuButton>
+              <NavLink nounderline="true" to={"/docs"}>
+                Docs
+              </NavLink>
+            </NavMenuButton>
+            <NavMenuButton>
+              <NavLink nounderline="true" to={"/"}>
+                Premium
+              </NavLink>
+            </NavMenuButton>
+          </HiddenDesktop>
           <NavMenuButton onClick={() => this.logout()} nounderline="true">Log out</NavMenuButton>
         </Menu>
       )
@@ -97,7 +116,9 @@ class UserMenu extends Component {
         this.setState({expanded: !this.state.expanded})
       }} expanded={this.state.expanded}>
         <Avatar src={`https://cdn.discordapp.com/avatars/${this.props.user.id}/${this.props.user.avatar}.${this.avatarExtension()}`} />
-        {this.props.user.username}
+        <TextHolder>
+          {this.props.user.username}
+        </TextHolder>
         <FlexPadder />
         <Arrow expanded={this.state.expanded} />
         {this.renderMenu()}

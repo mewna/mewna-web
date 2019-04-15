@@ -1,14 +1,20 @@
 import React, { Component } from "react"
 import styled from "@emotion/styled"
 
-import { darkBackground, textColor } from "./Utils"
+import { medBackground, textColor } from "./Utils"
 
-const Button = styled.a`
+export default styled.button`
   border: 0;
   background: none;
   box-shadow: none;
   border-radius: 2px;
-  ${darkBackground}
+  padding: 0.5em;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  ${medBackground}
   ${textColor}
 
   &:hover {
@@ -20,13 +26,3 @@ const Button = styled.a`
     border-color: ${props => props.theme.colors.brand};
   }
 `
-
-export const PaddedButton = styled(Button)`
-  padding: 0.5em;
-`
-
-export default class extends Component {
-  render() {
-    return <Button {...this.props} />
-  }
-}

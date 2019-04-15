@@ -61,9 +61,22 @@
   "levels": {
     "role-rewards": "Role Rewards",
     "how-it-works": "How Levels Work",
-    "no-rewards": "This server has no role rewards set up.",
+    "no-rewards": "$name has no role rewards set up.",
     "view-rank": "You can view your rank with $prefixrank.",
     "exp-gain": "You gain a random amount of exp 10 and 25 per message. To prevent spamming, you can only gain exp once per minute."
+  },
+  "profile": {
+    "about": "About $name",
+    "edit": {
+      "background-modal": "Choose a background",
+      "background": "Click to change background image",
+      "premium-backgrounds": "Upgrade to Mewna Premium to get more backgrounds, or upload your own!",
+      "background-upload": "Upload your own",
+      "bad-config": "Your settings are invalid. Make sure that you haven't left anything blank."
+    },
+    "post": {
+      "no-content": "No post content."
+    }
   },
   "commands": {
     "economy": {

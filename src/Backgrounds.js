@@ -15,12 +15,12 @@ import tree from "./assets/backgrounds/premium/tree.png"
 import waves from "./assets/backgrounds/premium/waves.png"
 import writingMap from "./assets/backgrounds/premium/writing-map.png"
 
-const defaultBackgrounds = {
+export const defaultBackgrounds = {
   "/backgrounds/default/plasma": plasma,
   "/backgrounds/default/rainbow_triangles": rainbowTriangles,
   "/backgrounds/default/triangles": triangles,
 }
-const premiumBackgrounds = {
+export const premiumBackgrounds = {
   "/backgrounds/premium/architecture": architecture,
   "/backgrounds/premium/beach": beach,
   "/backgrounds/premium/city": city,
@@ -33,6 +33,15 @@ const premiumBackgrounds = {
   "/backgrounds/premium/tree": tree,
   "/backgrounds/premium/waves": waves,
   "/backgrounds/premium/writing-map": writingMap,
+}
+
+export const backgroundName = bg => {
+  let found = Object.keys(defaultBackgrounds).find(k => defaultBackgrounds[k] === bg)
+  if(found) {
+    return found
+  } else {
+    return Object.keys(premiumBackgrounds).find(k => premiumBackgrounds[k] === bg)
+  }
 }
 
 export default background => {

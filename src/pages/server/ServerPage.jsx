@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet"
 
 import regeneratorRuntime from "regenerator-runtime"
 
-import background from "../../assets/backgrounds/default/plasma.png"
 import mewna from "../../assets/mewna-avatar.png"
 
 import Container from "../../comp/Container"
@@ -15,6 +14,7 @@ import store from "../../Storage"
 import api from "../../Api"
 import { toggleState, success, error } from "../../Utils"
 import $ from "../../Translate"
+import backgroundLookup from "../../Backgrounds"
 import { withToastManager } from 'react-toast-notifications';
 
 import ServerTimeline from "./ServerTimeline"
@@ -33,12 +33,15 @@ import styled from "@emotion/styled"
 export default withToastManager(class extends Component {
   constructor(props) {
     super(props)
+    this.editRegistry = []
     this.state = {
+      editing: false,
       manages: false,
       config: {},
       leaderboard: [],
       rewards: [],
       prefix: "mew.",
+      info: {},
       cache: {
         guild: {},
         channels: [],
@@ -46,6 +49,14 @@ export default withToastManager(class extends Component {
         webhooks: [],
       },
     }
+  }
+
+  editRegister(e) {
+    this.editRegistry.push(e)
+  }
+
+  editUnregister(e) {
+    this.editRegistry = this.editRegistry.filter(x => x !== e)
   }
 
   async handleRefreshMessage(e) {
@@ -67,12 +78,14 @@ export default withToastManager(class extends Component {
       const channels = await api.cachedChannels(host, id)
       const roles = await api.cachedRoles(host, id)
       const webhooks = manages ? await api.guildWebhooks(host, id) : []
+      const info = await api.guildInfo(host, id)
       this.setState({
         manages: manages,
         config: config,
         leaderboard: leaderboard,
         rewards: rewards,
         prefix: prefix,
+        info: info,
         cache: {
           guild: guild,
           channels: channels,
@@ -114,7 +127,14 @@ export default withToastManager(class extends Component {
   chooseSubpage() {
     if(!this.props.match.params.key) {
       // No subkey, render timeline
-      return <ServerTimeline />
+      return <ServerTimeline
+        manages={this.state.manages}
+        info={this.state.info}
+        cache={this.state.cache}
+        editing={this.state.editing}
+        editRegister={e => this.editRegister(e)}
+        editUnregister={e => this.editUnregister(e)}
+      />
     } else if(this.props.match.params.key === "leaderboard") {
       // Render leaderboards
       return <ServerLeaderboard
@@ -122,6 +142,7 @@ export default withToastManager(class extends Component {
           leaderboard={this.state.leaderboard}
           rewards={this.state.rewards}
           prefix={this.state.prefix}
+          cache={this.state.cache}
         />
     } else if(this.props.match.params.key === "edit") {
       if(this.state.manages) {
@@ -130,55 +151,27 @@ export default withToastManager(class extends Component {
           // Render base page
           return <ServerSettings match={this.props.match} />
         } else {
+          const pageProps = {
+            config: this.state.config,
+            updateConfig: (data, callback) => this.updateConfig(data, callback),
+            renderCommands: section => this.renderCommands(section),
+            renderCommandsHeader: () => this.renderCommandsHeader(),
+            cache: this.state.cache,
+            update: async () => this.updateRender(),
+          }
           switch(this.props.match.params.subkey) {
             case "general":
-              return <General config={this.state.config}
-                updateConfig={(data, callback) => this.updateConfig(data, callback)}
-                renderCommands={section => this.renderCommands(section)}
-                renderCommandsHeader={() => this.renderCommandsHeader()}
-                cache={this.state.cache}
-                update={async () => this.updateRender()}
-              />
+              return <General {...pageProps} />
             case "economy":
-              return <Economy config={this.state.config}
-                updateConfig={(data, callback) => this.updateConfig(data, callback)}
-                renderCommands={section => this.renderCommands(section)}
-                renderCommandsHeader={() => this.renderCommandsHeader()}
-                cache={this.state.cache}
-                update={async () => this.updateRender()}
-              />
+              return <Economy {...pageProps} />
             case "levels":
-              return <Levels config={this.state.config}
-                updateConfig={(data, callback) => this.updateConfig(data, callback)}
-                renderCommands={section => this.renderCommands(section)}
-                renderCommandsHeader={() => this.renderCommandsHeader()}
-                cache={this.state.cache}
-                update={async () => this.updateRender()}
-              />
+              return <Levels {...pageProps} />
             case "music":
-              return <Music config={this.state.config}
-                updateConfig={(data, callback) => this.updateConfig(data, callback)}
-                renderCommands={section => this.renderCommands(section)}
-                renderCommandsHeader={() => this.renderCommandsHeader()}
-                cache={this.state.cache}
-                update={async () => this.updateRender()}
-              />
+              return <Music {...pageProps} />
             case "notifications":
-              return <Notifications config={this.state.config}
-                updateConfig={(data, callback) => this.updateConfig(data, callback)}
-                renderCommands={section => this.renderCommands(section)}
-                renderCommandsHeader={() => this.renderCommandsHeader()}
-                cache={this.state.cache}
-                update={async () => this.updateRender()}
-              />
+              return <Notifications {...pageProps} />
             case "miscellaneous":
-              return <Misc config={this.state.config}
-                updateConfig={(data, callback) => this.updateConfig(data, callback)}
-                renderCommands={section => this.renderCommands(section)}
-                renderCommandsHeader={() => this.renderCommandsHeader()}
-                cache={this.state.cache}
-                update={async () => this.updateRender()}
-              />
+              return <Misc {...pageProps} />
           }
         }
       } else {
@@ -196,16 +189,42 @@ export default withToastManager(class extends Component {
     return (
       <Container>
         <Helmet>
-          <title>Mewna :: Mewna Comewnaty</title>
+          <title>Mewna :: {this.state.cache.guild.name || "Unknown server"}</title>
         </Helmet>
         <ServerHeader
-            serverId={this.props.match.params.id}
-            serverName={this.state.cache.guild.name || "Unknown server"}
-            serverIcon={this.state.cache.guild.icon || mewna}
-            backgroundImage={background}
-            currentPath={this.props.location.pathname}
-            manages={this.state.manages}
-          />
+          serverId={this.props.match.params.id}
+          serverName={this.state.cache.guild.name || "Unknown server"}
+          serverIcon={this.state.cache.guild.icon || mewna}
+          info={this.state.info}
+          customBackground={backgroundLookup(this.state.info.customBackground || "/backgrounds/default/plasma")}
+          currentPath={this.props.location.pathname}
+          manages={this.state.manages}
+          editRegister={e => this.editRegister(e)}
+          editUnregister={e => this.editUnregister(e)}
+          editClickCallback={() => {
+            this.setState({editing: true})
+          }}
+          editCancelClickCallback={() => {
+            this.editRegistry.map(e => e.resetEdits())
+            this.setState({editing: false})
+          }}
+          editFinishClickCallback={async () => {
+            const changes = this.editRegistry.map(e => e.fetchEdits()).reduce(((r, c) => Object.assign(r, c)), {})
+            const info = Object.assign(Object.assign({}, this.state.info), changes)
+            const host = api.clientHostname()
+            const id = this.props.match.params.id
+            const result = await api.updateGuildInfo(host, id, info)
+            if(result["errors"]) {
+              error(this, $("en_US", "profile.edit.bad-config"))
+              return false
+            } else {
+              this.setState({editing: false}, async () => {
+                await this.updateRender()
+              })
+              return true
+            }
+          }}
+        />
         {this.chooseSubpage()}
       </Container>
     )

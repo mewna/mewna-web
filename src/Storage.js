@@ -12,8 +12,14 @@ export class Storage {
     return this.cookies.get(key)
   }
 
-  set(key, value) {
-    const res = this.cookies.set(key, value, { path: "/" })
+  set(key, value, host) {
+    let finalHost = ""
+    if(host) {
+      finalHost = host
+    } else {
+      finalHost = typeof window !== "undefined" ? window.location.host : null
+    }
+    const res = this.cookies.set(key, value, { path: "/", domain: finalHost })
     return res
   }
 
@@ -33,18 +39,18 @@ export class Storage {
     return "light"
   }
 
-  getLightTheme() {
+  getLightTheme(host) {
     if (
       this.get(this.getLightThemeKey()) === undefined ||
       this.get(this.getLightThemeKey()) === null
     ) {
-      this.set(this.getLightThemeKey(), false)
+      this.set(this.getLightThemeKey(), false, host)
     }
     return this.get(this.getLightThemeKey()) === "true"
   }
 
-  setLightTheme(mode) {
-    const res = this.set(this.getLightThemeKey(), !!mode)
+  setLightTheme(mode, host) {
+    const res = this.set(this.getLightThemeKey(), !!mode, host)
     this.update()
     return res
   }
@@ -63,8 +69,8 @@ export class Storage {
     }
   }
 
-  setToken(token) {
-    const res = this.set(this.getTokenKey(), token)
+  setToken(token, host) {
+    const res = this.set(this.getTokenKey(), token, host)
     this.update()
     return res
   }

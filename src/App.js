@@ -11,6 +11,7 @@ import { ThemeProvider } from "emotion-theming"
 import { Helmet } from "react-helmet"
 import merge from "lodash.merge"
 import { ToastProvider } from "react-toast-notifications"
+import reactTreeWalker from 'react-tree-walker'
 
 import getTheme from "./Theme"
 import storage from "./Storage"
@@ -85,13 +86,17 @@ setupIcons()
 export default class App extends Component {
   static async getInitialProps(ctx) {
     // const { req, res, app, isServer, fullPath, path, query } = ctx
-    const { req, app } = ctx
+    const { req } = ctx
     return {
       // Fetch from cookies ahead of time, that way the initial render will
       // always be correct
       host: req.headers.host,
-      lightTheme: storage.getLightTheme(),
+      lightTheme: storage.getLightTheme(req.headers.host),
     }
+  }
+
+  static async walkTreeForProps(ctx) {
+    return {}
   }
 
   constructor(props) {

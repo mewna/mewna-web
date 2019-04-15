@@ -5,6 +5,7 @@ import FlexPadder from "./FlexPadder"
 import NavLink from "./NavLink"
 import LoginButton from "./navbar/LoginButton"
 import UserMenu from "./navbar/UserMenu"
+import { HiddenMobile } from "./HiddenMobile"
 
 import { css } from "@emotion/core"
 import styled from "@emotion/styled"
@@ -85,16 +86,18 @@ export default class Navbar extends Component {
             </NavLink>
           </NavTitle>
           <FlexPadder />
-          <NavItem>
-            <NavLink nounderline="true" to={"/docs"}>
-              Docs
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink nounderline="true" to={"/"}>
-              Premium
-            </NavLink>
-          </NavItem>
+          <HiddenMobile>
+            <NavItem>
+              <NavLink nounderline="true" to={"/docs"}>
+                Docs
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink nounderline="true" to={"/"}>
+                Premium
+              </NavLink>
+            </NavItem>
+          </HiddenMobile>
           {this.renderUserMenu()}
         </Container>
       </Bar>

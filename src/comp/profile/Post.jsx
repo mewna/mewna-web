@@ -1,14 +1,19 @@
 import React, { Component } from "react"
 
-import { css } from "@emotion/core"
 import styled from "@emotion/styled"
 
 import Card from "../Card"
-import Container from "../Container"
-import { FlexPadderDesktop } from "../FlexPadder"
-import hiddenMobile from "../HiddenMobile"
-import NavLink from "../NavLink"
 import { darkBackground, lightBackground, hoverBackground } from "../Utils"
+
+import Markdown from "react-markdown"
+
+export const renderPostBody = markdown => {
+  return (
+    <Markdown>
+      {markdown}
+    </Markdown>
+  )
+}
 
 export const PostContainer = styled.div`
   width: 100%;

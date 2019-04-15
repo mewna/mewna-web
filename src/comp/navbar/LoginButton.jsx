@@ -37,7 +37,7 @@ export default class extends Component {
   handleLoginMessage(e) {
     const data = e.data
     if (data.type === "login") {
-      store.setToken(data.token)
+      store.setToken(data.token, window.location.hostname)
     }
   }
 }

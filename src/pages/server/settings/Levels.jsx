@@ -7,7 +7,7 @@ import { PaddedCard, InternalWidthFixer } from "../../../comp/Card"
 import DebouncedTextarea from "../../../comp/DebouncedTextarea"
 import FlexContainer from "../../../comp/FlexContainer"
 import Switch from "../../../comp/Switch"
-import { PaddedButton } from "../../../comp/Button"
+import PaddedButton from "../../../comp/Button"
 import Select from "../../../comp/Select"
 import FlexPadder from "../../../comp/FlexPadder"
 import { withToastManager } from 'react-toast-notifications'

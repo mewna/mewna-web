@@ -1,73 +1,153 @@
 import React, { Component } from "react"
 
 import Grid, { SideGrid, ProfileGrid } from "../../comp/GridContainer"
-import Container from "../../comp/Container";
-import SideCard from "../../comp/profile/SideCard";
+import Container from "../../comp/Container"
+import SideCard from "../../comp/profile/SideCard"
+import { TextareaWithCallback } from "../../comp/Textarea"
+import { PaddedCard } from "../../comp/Card"
+import Button from "../../comp/Button"
+import $ from "../../Translate"
+import { renderPostBody } from "../../comp/profile/Post"
+import styled from "@emotion/styled"
+import { lightBackground, textColor, medBackground } from "../../comp/Utils"
 
 export default class extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      postData: "",
+      write: true,
+      aboutText: this.props.info.aboutText,
+    }
+  }
+
+  componentDidMount() {
+    this.props.editRegister(this)
+  }
+  
+  componentWillUnmount() {
+    this.props.editUnregister(this)
+  }
+  
+  fetchEdits() {
+    return {aboutText: this.state.aboutText}
+  }
+
+  resetEdits() {
+    this.setState({aboutText: this.props.info.aboutText})
+  }
+
+  componentDidUpdate(prevProps) {
+    if(prevProps.info.aboutText !== this.props.info.aboutText) {
+      this.setState({aboutText: this.props.info.aboutText})
+    }
+  }
+
+  renderAbout() {
+    if(this.props.editing) {
+      return (
+        <TextareaWithCallback
+          value={this.state.aboutText} callback={e => this.setState({aboutText: e.value})}
+          />
+      )
+    } else {
+      return this.props.info.aboutText
+    }
+  }
+
   render() {
     return (
       <Container>
         <ProfileGrid>
           <SideGrid>
             <SideCard>
-              banana
+              <h4>{$("en_US", "profile.about").replace("$name", this.props.cache.guild.name || "Unknown server")}</h4>
+              {this.renderAbout()}
             </SideCard>
             <SideCard>
-              tuna salad
+              maybe an ad idk
             </SideCard>
           </SideGrid>
           <Grid>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
-            <div>tato</div>
+            {this.renderEditor()}
           </Grid>
         </ProfileGrid>
       </Container>
     )
   }
-  /*
-  render() {
-    return (
-      <FourColGrid>
-        {renderPost(
-          "Winter 2018 Anime Review",
-          "amy",
-          "https://i.pinimg.com/originals/da/b2/d4/dab2d405730473923d33a32e814950cd.jpg"
-        )}
-        {renderPost(
-          "How to have the coolest Discord server ever",
-          "amy",
-          "https://discordapp.com/assets/f8389ca1a741a115313bede9ac02e2c0.svg"
-        )}
-        {renderPost(
-          "Kittens of 2019 (so far)",
-          "amy",
-          "https://www.sonomamag.com/wp-content/uploads/2018/05/shutterstock_352176329.jpg"
-        )}
-        {renderPost(
-          "Farming currency without getting banned",
-          "amy",
-          "https://static.greatbigcanvas.com/images/singlecanvas_thick_none/getty-images/pile-of-money,1008107.jpg?max=1000"
-        )}
-        {renderPost(
-          "Getting help and reporting bugs",
-          "amy",
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg/705px-Operation_Upshot-Knothole_-_Badger_001.jpg"
-        )}
-      </FourColGrid>
-    )
+
+  renderEditor() {
+    if(this.props.manages) {
+      return (
+        <PaddedCard>
+          <EditorContainer>
+            <EditorTab selected={this.state.write} onClick={() => this.setState({write: true})}>Write</EditorTab>
+            <EditorTab selected={!this.state.write} onClick={() => this.setState({write: false})}>Preview</EditorTab>
+          </EditorContainer>
+          <EditorContainer>
+            <SlightMargin>
+              {this.renderEditorTextarea()}
+              {this.renderEditorPreview()}
+            </SlightMargin>
+          </EditorContainer>
+          <Button>POST</Button>
+        </PaddedCard>
+      )
+    } else {
+      return ""
+    }
   }
-  */
+
+  renderEditorTextarea() {
+    if(this.state.write) {
+      return <TextareaWithCallback
+        value={this.state.postData}
+        min-rows={8}
+        rows={8}
+        callback={e => {
+          this.setState({postData: e.value})
+        }}
+      />
+    } else {
+      return ""
+    }
+  }
+
+  renderEditorPreview() {
+    if(this.state.write) {
+      return ""
+    } else {
+      if(this.state.postData) {
+        return renderPostBody(this.state.postData)
+      } else {
+        return $("en_US", "profile.post.no-content")
+      }
+    }
+  }
 }
+
+const EditorTab = styled.button`
+  border: 0;
+  border-bottom: 2px solid ${props => props.selected ? props.theme.colors.brand : "transparent"};
+  background: none;
+  box-shadow: none;
+  border-radius: 2px;
+  padding: 6px;
+  ${lightBackground}
+  ${textColor}
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:hover, &:focus {
+    outline: none;
+  }
+`
+const SlightMargin = styled.div`
+  margin-bottom: 1em;
+`
+const EditorContainer = styled.div`
+  margin-bottom: 1em;
+  border-bottom: 1px solid ${props => props.theme.colors.med};
+`

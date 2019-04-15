@@ -71,7 +71,7 @@ export default class extends Component {
     if(this.props.rewards.length == 0) {
       return (
         <div>
-          {$("en_US", "levels.no-rewards")}
+          {$("en_US", "levels.no-rewards").replace("$name", this.props.cache.guild.name || "Unknown server")}
         </div>
       )
     } else {
