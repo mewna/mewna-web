@@ -2,8 +2,14 @@ import React, { Component } from "react"
 
 import styled from "@emotion/styled"
 
-import Card from "../Card"
+import Card, { PaddedCard } from "../Card"
+import FlexPadder from "../FlexPadder"
 import { darkBackground, lightBackground, hoverBackground } from "../Utils"
+import backgroundLookup from "../../Backgrounds"
+import $ from "../../Translate"
+import bigInt from "big-integer"
+import { formatRelative } from 'date-fns'
+import { MEWNA_EPOCH } from "../../Const"
 
 import Markdown from "react-markdown"
 
@@ -15,68 +21,162 @@ export const renderPostBody = markdown => {
   )
 }
 
-export const PostContainer = styled.div`
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
-  grid-column-gap: 2em;
-  grid-row-gap: 2em;
-  grid-auto-rows: 1fr;
-
-  @media screen and (max-width: 768px) {
-    grid-template-columns: 1fr;
+export const renderSystemPostText = (type, data) => {
+  switch(type) {
+    case "event.levels.global": {
+      return $("en_US", "profile." + type)
+        .replace("$name", data.name)
+        .replace("$level", data.level)
+    }
+    case "event.money": {
+      return $("en_US", "profile." + type)
+        .replace("$name", data.name)
+        .replace("$money", data.money)
+    }
+    case "event.account.background": {
+      return $("en_US", "profile." + type)
+        .replace("$name", data.name)
+    }
+    case "event.account.description": {
+      return $("en_US", "profile." + type)
+        .replace("$name", data.name)
+    }
+    case "event.account.displayName": {
+      return $("en_US", "profile." + type)
+        .replace("$name", data.name)
+        .replace("$old", data.old)
+        .replace("$new", data.newName)
+    }
+    case "event.server.name": {
+      return $("en_US", "profile." + type)
+        .replace("$server", data.name)
+        .replace("$name", data.name)
+    }
+    case "event.server.description": {
+      return $("en_US", "profile." + type)
+        .replace("$server", data.name)
+    }
+    case "event.server.background": {
+      return $("en_US", "profile." + type)
+        .replace("$server", data.name)
+    }
   }
-`
-export const PostCardWrapper = styled.div`
-  width: 100%;
-  min-height: 21rem;
-  position: relative;
-
-  ${Card} {
-    height: 100%;
-  }
-`
-export const postCardImageComponent = img => styled.div`
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  width: 100%;
-  height: 21rem;
-  overflow: hidden;
-  margin: 0;
-  background: url("${img}") center / cover;
-`
-export const PostCardTitle = styled.div`
-  min-height: 1rem;
-  padding: 0.5em;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: calc(100% - 1em);
-  text-align: left;
-  ${hoverBackground}
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-`
-
-export const renderCardImage = (url) => {
-  const Pcard = postCardImageComponent(url)
-  return <Pcard />
 }
 
-export default (title, author, imageUrl) => {
+export const renderSystemPost = (text, styles, key, date) => {
   return (
-    <PostCardWrapper>
-      <Card>
-        {renderCardImage(imageUrl)}
-        <PostCardTitle>
-          <strong>{title}</strong>
-          <br />
-          by {author}
-        </PostCardTitle>
-      </Card>
-    </PostCardWrapper>
+    <PaddedCard key={key} style={styles}>
+      {text}<FlexPadder />{date}
+    </PaddedCard>
   )
 }
+
+export const renderUserPost = (key, author, date, markdown, buttons) => {
+  return (
+    <PaddedCard key={key}>
+      <PostHeader>
+        <PostHeaderAvatar src={author.avatar} />
+        {author.name}
+        <FlexPadder />
+        {date}
+      </PostHeader>
+      <div>
+        <Markdown>
+          {markdown}
+        </Markdown>
+      </div>
+      <PostFooter>
+        {buttons}
+      </PostFooter>
+    </PaddedCard>
+  )
+}
+
+export const renderPost = (post, key, currentPostAuthor, authors, buttons, format) => {
+  if(post.content.text) {
+    // User post
+    const data = post.content.text
+    const now = new Date()
+    const author = currentPostAuthor || authors[data.author]
+    return renderUserPost(key, author, formatRelative(new Date(bigInt(post.id).shiftRight(22).valueOf() + MEWNA_EPOCH), now),
+      data.content, buttons())
+  } else {
+    // System post
+    const data = post.content.data
+    const now = new Date()
+    let formats = {}
+    let styles = {display: "flex", flexDirection: "row"}
+    switch(data.type) {
+      case "event.levels.global": {
+        formats = renderFormats(format, data.type, ["name"])
+        break
+      }
+      case "event.money": {
+        formats = renderFormats(format, data.type, ["name", "money"])
+        break
+      }
+      case "event.account.background": {
+        formats = renderFormats(format, data.type, ["name"])
+        styles = Object.assign(styles, {
+          background: `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("${backgroundLookup(data.bg)}") center / cover`
+        })
+        break
+      }
+      case "event.account.description": {
+        formats = renderFormats(format, data.type, ["name"])
+        break
+      }
+      case "event.account.displayName": {
+        formats = renderFormats(format, data.type, ["name", "old", "newName"])
+        break
+      }
+      case "event.server.name": {
+        formats = renderFormats(format, data.type, ["name"])
+        break
+      }
+      case "event.server.description": {
+        formats = renderFormats(format, data.type, ["name"])
+        break
+      }
+      case "event.server.background": {
+        formats = renderFormats(format, data.type, ["name"])
+        styles = Object.assign(styles, {
+          background: `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("${backgroundLookup(data.bg)}") center / cover`
+        })
+        break
+      }
+    }
+    let text = renderSystemPostText(data.type, formats)
+
+    return renderSystemPost(text, styles, key, formatRelative(new Date(bigInt(post.id).shiftRight(22).valueOf() + MEWNA_EPOCH), now))
+  }
+}
+
+const renderFormats = (f, type, keys) => {
+  const out = f(type, keys)
+  return Object.assign({}, out)
+}
+
+const PostHeader = styled.div`
+  display: flex;
+  align-items: center;
+  align-content: center;
+  border-bottom: 1px solid ${props => props.theme.colors.med};
+  margin-bottom: 0.5em;
+  padding-bottom: 0.5em;
+`
+const PostHeaderAvatar = styled.img`
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin-right: 0.5em;
+  border-radius: 50%;
+`
+const PostFooter = styled.div`
+  display: flex;
+  align-items: center;
+  align-content: center;
+  border-top: 1px solid ${props => props.theme.colors.med};
+  margin-top: 0.5em;
+  padding-top: 0.5em;
+`

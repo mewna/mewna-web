@@ -13,9 +13,9 @@ import ServerHeader from "../../comp/profile/ServerHeader"
 import store from "../../Storage"
 import api from "../../Api"
 import { toggleState, success, error } from "../../Utils"
+import { withToastManager } from 'react-toast-notifications'
 import $ from "../../Translate"
 import backgroundLookup from "../../Backgrounds"
-import { withToastManager } from 'react-toast-notifications';
 
 import ServerTimeline from "./ServerTimeline"
 import ServerSettings from "./ServerSettings"
@@ -42,6 +42,8 @@ export default withToastManager(class extends Component {
       rewards: [],
       prefix: "mew.",
       info: {},
+      posts: [],
+      authors: {},
       cache: {
         guild: {},
         channels: [],
@@ -67,6 +69,7 @@ export default withToastManager(class extends Component {
 
   async updateRender() {
     if(typeof window !== undefined) {
+      // TODO: Should wrap this in a Promise.all() to avoid running them one at a time
       const host = api.clientHostname()
       const id = this.props.match.params.id
       const manages = await api.manages(host, id)
@@ -74,6 +77,15 @@ export default withToastManager(class extends Component {
       const leaderboard = await api.guildLeaderboard(host, id)
       const rewards = await api.guildRewards(host, id)
       const prefix = await api.guildPrefix(host, id).prefix || "mew."
+      const posts = await api.getPosts(host, id)
+      // Filter out unique authors from custom posts. This will let us avoid
+      // fetching info more than once for no reason :blobcatzippermouth:
+      const authors = [...new Set(posts.filter(e => e.content.text).map(e => e.content.text.author))]
+      let authorData = await Promise.all(authors.map(e => api.getAuthor(host, e)))
+      authorData = authorData.reduce((obj, item) => {
+        obj[item.id] = item
+        return obj
+      }, {})
       const guild = await api.cachedGuild(host, id)
       const channels = await api.cachedChannels(host, id)
       const roles = await api.cachedRoles(host, id)
@@ -86,6 +98,8 @@ export default withToastManager(class extends Component {
         rewards: rewards,
         prefix: prefix,
         info: info,
+        posts: posts,
+        authors: authorData,
         cache: {
           guild: guild,
           channels: channels,
@@ -125,7 +139,7 @@ export default withToastManager(class extends Component {
   }
 
   chooseSubpage() {
-    if(!this.props.match.params.key) {
+    if(!this.props.match.params.key || /\d+/.test(this.props.match.params.key)) {
       // No subkey, render timeline
       return <ServerTimeline
         manages={this.state.manages}
@@ -134,6 +148,10 @@ export default withToastManager(class extends Component {
         editing={this.state.editing}
         editRegister={e => this.editRegister(e)}
         editUnregister={e => this.editUnregister(e)}
+        posts={this.state.posts}
+        authors={this.state.authors}
+        postId={this.props.match.params.key}
+        updateRender={() => this.updateRender()}
       />
     } else if(this.props.match.params.key === "leaderboard") {
       // Render leaderboards
@@ -180,7 +198,7 @@ export default withToastManager(class extends Component {
         )
       }
     } else {
-      // Render a timeline post
+      // TODO: Redirect to /
       return "TODO"
     }
   }

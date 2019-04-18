@@ -75,7 +75,25 @@
       "bad-config": "Your settings are invalid. Make sure that you haven't left anything blank."
     },
     "post": {
-      "no-content": "No post content."
+      "no-content": "No post content.",
+      "too-short": "Please write a little more ($number characters minimum).",
+      "delete": "Post deleted!"
+    },
+    "event": {
+      "levels": {
+        "global": "$name reached level $level."
+      },
+      "money": "$name earned $money money.",
+      "account": {
+        "background": "$name updated their background.",
+        "description": "$name updated their description.",
+        "displayName": "$name updated their name from $old to $new."
+      },
+      "server": {
+        "name": "$server's name was changed to $name.",
+        "description": "$server's description was updated.",
+        "background": "$server's background was updated."
+      }
     }
   },
   "commands": {

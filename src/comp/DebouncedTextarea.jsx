@@ -25,14 +25,14 @@ export default class DebouncedTextarea extends Component {
     this.maxChars = this.props.maxChars ? this.props.maxChars : MAX_CHARS
 
     if (props.callback) {
-      this.handleChangeInternal = debounce(1500, false, this.props.callback)
+      this.handleChangeInternal = debounce(this.props.debounce || 1500, false, this.props.callback)
     } else {
-      this.handleChangeInternal = debounce(1500, false, e => {})
+      this.handleChangeInternal = debounce(this.props.debounce || 1500, false, e => {})
     }
 
     this.state = {
-      chars_left: this.maxChars - initial,
-      textarea_value: this.props.value
+      charsLeft: this.maxChars - initial,
+      textareaValue: this.props.value
     }
   }
 
@@ -45,8 +45,8 @@ export default class DebouncedTextarea extends Component {
     this.handleChangeInternal(e.target)
     this.setState(
       {
-        chars_left: this.maxChars - input.length,
-        textarea_value: input
+        charsLeft: this.maxChars - input.length,
+        textareaValue: input
       }
     )
   }
@@ -58,10 +58,10 @@ export default class DebouncedTextarea extends Component {
           onChange={e => this.handleChange(e)}
           rows={this.props["rows"]}
           min-rows={this.props["min-rows"]}
-          value={this.state.textarea_value}
+          value={this.state.textareaValue}
         />
         <TextCounter>
-          {this.maxChars - this.state.chars_left}/{this.maxChars}
+          {this.maxChars - this.state.charsLeft}/{this.maxChars}
         </TextCounter>
       </Relative>
     )

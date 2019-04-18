@@ -28,7 +28,7 @@ import { ThreeColGrid } from "../GridContainer"
 export const renderTab = (title, icon, route, currentPath) => {
   let TabComp
   if (route.match(/^\/server\/\d+\/?$/)) {
-    TabComp = currentPath === route ? SelectedTab : Tab
+    TabComp = currentPath === route || currentPath.match(/^\/server\/\d+\/\d+$/) ? SelectedTab : Tab
   } else {
     TabComp = currentPath.startsWith(route) ? SelectedTab : Tab
   }
@@ -215,7 +215,7 @@ export default class extends Component {
   }
 
   renderEditButton(route) {
-    if(this.props.manages && route.match(/^\/server\/\d+\/?$/)) {
+    if(this.props.manages && (route.match(/^\/server\/\d+\/?$/) || route.match(/^\/server\/\d+\/\d+$/))) {
       if(this.state.editing) {
         return (
           <TwoButtonWrapper>

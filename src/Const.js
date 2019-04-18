@@ -10,3 +10,5 @@ export const backendUrl = host => {
 }
 
 export const twitchClientId = "s08k18j061m5sq9zqgblpie4icsph1"
+
+export const MEWNA_EPOCH = 1518566400000

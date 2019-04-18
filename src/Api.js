@@ -5,219 +5,16 @@ import store from "./Storage"
 import {backgroundImage} from "./comp/profile/Header";
 
 class Api {
+  /////////////
+  // HELPERS //
+  /////////////
+
   token() {
     return store.getToken()
   }
 
-  async heartbeat(hostname) {
-    try {
-      if(hostname && this.token()) {
-        const out = await axios.get(`${backendUrl(hostname)}/api/auth/heartbeat`, {
-          headers: {
-            "Authorization": this.token()
-          }
-        })
-        return out.data
-      } else {
-        return null
-      }
-    } catch(e) {
-      return null
-    }
-  }
-
-  async manages(hostname, guild) {
-    try {
-      if(hostname && this.token()) {
-        const out = await axios.get(`${backendUrl(hostname)}/api/auth/guilds/manages/${guild}`, {
-          headers: {
-            "Authorization": this.token()
-          }
-        })
-        return out.data["manages"]
-      } else {
-        return false
-      }
-    } catch(e) {
-      return false
-    }
-  }
-
-  async guildConfig(hostname, guild) {
-    try {
-      if(hostname && this.token()) {
-        const out = await axios.get(`${backendUrl(hostname)}/api/auth/guilds/config/${guild}`, {
-          headers: {
-            "Authorization": this.token()
-          }
-        })
-        return out.data
-      } else {
-        return {}
-      }
-    } catch(e) {
-      return {}
-    }
-  }
-
-  async updateGuildConfig(hostname, guild, data) {
-    if(hostname && this.token()) {
-      const out = await axios.post(`${backendUrl(hostname)}/api/auth/guilds/config/${guild}`, data, {
-        headers: {
-          "Authorization": this.token()
-        }
-      })
-      return out.data
-    }
-  }
-
-  async guildLeaderboard(hostname, guild) {
-    try {
-      if(hostname) {
-        const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/leaderboard`)
-        return out.data
-      } else {
-        return []
-      }
-    } catch(e) {
-      return []
-    }
-  }
-
-  async guildRewards(hostname, guild) {
-    try {
-      if(hostname) {
-        const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/rewards`)
-        return out.data
-      } else {
-        return []
-      }
-    } catch(e) {
-      return []
-    }
-  }
-
-  async guildPrefix(hostname, guild) {
-    try {
-      if(hostname) {
-        const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/prefix`)
-        return out.data
-      } else {
-        return {}
-      }
-    } catch(e) {
-      return {}
-    }
-  }
-
-  async guildInfo(hostname, guild) {
-    try {
-      if(hostname) {
-        const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/info`)
-        return out.data
-      } else {
-        return {}
-      }
-    } catch(e) {
-      return {}
-    }
-  }
-
-  async updateGuildInfo(hostname, guild, data) {
-    try {
-      if(hostname && this.token()) {
-        const out = await axios.post(`${backendUrl(hostname)}/api/guild/${guild}/info`, data, {
-          headers: {
-            "Authorization": this.token()
-          }
-        })
-        return out.data
-      } else {
-        return {}
-      }
-    } catch(e) {
-      return {}
-    }
-  }
-
-  async guildWebhooks(hostname, guild) {
-    try {
-      if(hostname && this.token()) {
-        const out = await axios.get(`${backendUrl(hostname)}/api/auth/guilds/webhooks/${guild}`, {
-          headers: {
-            "Authorization": this.token()
-          }
-        })
-        return out.data
-      } else {
-        return {}
-      }
-    } catch(e) {
-      return {}
-    }
-  }
-
-  async deleteGuildWebhook(hostname, guild, webhook) {
-    try {
-      if(hostname && this.token()) {
-        const out = await axios.delete(`${backendUrl(hostname)}/api/auth/guilds/webhooks/${guild}/${webhook}`, {
-          headers: {
-            "Authorization": this.token()
-          }
-        })
-        return out.data
-      } else {
-        return {}
-      }
-    } catch(e) {
-      return {}
-    }
-  }
-
-  async logout(hostname) {
-    if(hostname && this.token()) {
-      await axios.post(`${backendUrl(hostname)}/api/auth/logout`, {
-        headers: {
-          "Authorization": this.token()
-        }
-      })
-    }
-  }
-
-  async cachedGuild(hostname, id) {
-    if(hostname) {
-      const out = await axios.get(`${backendUrl(hostname)}/api/cache/guild/${id}`)
-      return out.data
-    } else {
-      return {}
-    }
-  }
-
-  async cachedUser(hostname, id) {
-    if(hostname) {
-      const out = await axios.get(`${backendUrl(hostname)}/api/cache/user/${id}`)
-      return out.data
-    } else {
-      return {}
-    }
-  }
-
-  async cachedChannels(hostname, id) {
-    if(hostname) {
-      const out = await axios.get(`${backendUrl(hostname)}/api/cache/guild/${id}/channels`)
-      return out.data
-    } else {
-      return []
-    }
-  }
-
-  async cachedRoles(hostname, id) {
-    if(hostname) {
-      const out = await axios.get(`${backendUrl(hostname)}/api/cache/guild/${id}/roles`)
-      return out.data
-    } else {
-      return []
-    }
+  userId() {
+    return atob(this.token().split(".")[0])
   }
 
   clientHostname() {
@@ -226,6 +23,203 @@ class Api {
     } else {
       return null
     }
+  }
+
+  async authRequest(func) {
+    try {
+      if(this.token()) {
+        const headers = {
+          "Authorization": this.token()
+        }
+        return await func(headers)
+      } else {
+        return null
+      }
+    } catch(e) {
+      return null
+    }
+  }
+
+  async request(func) {
+    try {
+      return await func()
+    } catch(e) {
+      return null
+    }
+  }
+
+  //////////////////////
+  // BASIC AUTH STUFF //
+  //////////////////////
+
+  async heartbeat(hostname) {
+    return await this.authRequest(async headers => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/auth/heartbeat`, {headers: headers})
+      return out.data
+    })
+  }
+
+  async logout(hostname) {
+    return await this.authRequest(async headers => {
+      const out = await axios.post(`${backendUrl(hostname)}/api/auth/logout`, {headers: headers})
+      return out.data
+    })
+  }
+
+  //////////////////////
+  // GUILD MANAGEMENT //
+  //////////////////////
+
+  async manages(hostname, guild) {
+    return await this.authRequest(async headers => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/manages`, {headers: headers})
+      return out.data["manages"]
+    })
+  }
+
+  async guildConfig(hostname, guild) {
+    return await this.authRequest(async headers => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/config`, {headers: headers})
+      return out.data
+    })
+  }
+
+  async updateGuildConfig(hostname, guild, data) {
+    return await this.authRequest(async headers => {
+      const out = await axios.post(`${backendUrl(hostname)}/api/guild/${guild}/config`, data, {headers: headers})
+      return out.data
+    })
+  }
+
+  async updateGuildInfo(hostname, guild, data) {
+    return await this.authRequest(async headers => {
+      const out = await axios.post(`${backendUrl(hostname)}/api/guild/${guild}/info`, data, {headers: headers})
+        return out.data
+    })
+  }
+
+  async guildWebhooks(hostname, guild) {
+    return await this.authRequest(async headers => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/webhooks`, {headers: headers})
+      return out.data
+    })
+  }
+
+  async deleteGuildWebhook(hostname, guild, webhook) {
+    return await this.authRequest(async headers => {
+      const out = await axios.delete(`${backendUrl(hostname)}/api/guild/${guild}/webhooks/${webhook}`, {headers: headers})
+      return out.data
+    })
+  }
+
+  ////////////////
+  // GUILD DATA //
+  ////////////////
+
+  async guildLeaderboard(hostname, guild) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/leaderboard`)
+      return out.data
+    })
+  }
+
+  async guildRewards(hostname, guild) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/rewards`)
+      return out.data
+    })
+  }
+
+  async guildPrefix(hostname, guild) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/prefix`)
+      return out.data
+    })
+  }
+
+  async guildInfo(hostname, guild) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/info`)
+      return out.data
+    })
+  }
+
+  ///////////
+  // POSTS //
+  ///////////
+
+  async createPost(hostname, id, data) {
+    return await this.authRequest(async headers => {
+      const out = await axios.post(`${backendUrl(hostname)}/api/post/${id}/create`, data, {headers: headers})
+      return out.data
+    })
+  }
+
+  async getPost(hostname, id, post) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/post/${id}/${post}`)
+      return out.data
+    })
+  }
+
+  async getAuthor(hostname, id) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/post/author/${id}`)
+      return out.data
+    })
+  }
+
+  async deletePost(hostname, id, post) {
+    return await this.authRequest(async headers => {
+      const out = await axios.delete(`${backendUrl(hostname)}/api/post/${id}/${post}`, {headers: headers})
+      return out.data
+    })
+  }
+
+  async editPost(hostname, id, post, data) {
+    return await this.authRequest(async headers => {
+      const out = await axios.put(`${backendUrl(hostname)}/api/post/${id}/${post}`, data, {headers: headers})
+      return out.data
+    })
+  }
+
+  async getPosts(hostname, id) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/post/${id}/posts`)
+      return out.data
+    })
+  }
+
+  ///////////////////
+  // DISCORD CACHE //
+  ///////////////////
+
+  async cachedGuild(hostname, id) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/cache/guild/${id}`)
+      return out.data
+    })
+  }
+
+  async cachedUser(hostname, id) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/cache/user/${id}`)
+      return out.data
+    })
+  }
+
+  async cachedChannels(hostname, id) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/cache/guild/${id}/channels`)
+      return out.data
+    })
+  }
+
+  async cachedRoles(hostname, id) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/cache/guild/${id}/roles`)
+      return out.data
+    })
   }
 }
 
