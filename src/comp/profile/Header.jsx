@@ -8,17 +8,23 @@ import NavLink from "../NavLink"
 import { darkBackground, lightBackground, hoverBackground } from "../Utils"
 import BaseProfileIcon from "./Icon"
 
-export const renderTab = (title, icon, route, currentPath, styles) => {
+export const renderTab = (title, icon, route, currentPath, brandColour) => {
   let TabComp
   if (route.match(/^\/server\/\d+\/?$/)) {
     TabComp = currentPath === route || currentPath.match(/^\/server\/\d+\/\d+$/) ? SelectedTab : Tab
   } else {
     TabComp = currentPath.startsWith(route) ? SelectedTab : Tab
   }
+  let ColouredTabComp = TabComp
+  if(brandColour) {
+    ColouredTabComp = styled(TabComp)`
+      color: ${props => props.theme.colors.brand} !important;
+    `
+  }
   return (
-    <TabComp to={route} nounderline="true" style={styles || {}}>
+    <ColouredTabComp to={route} nounderline="true">
       <HiddenTabText>{title}</HiddenTabText> <FontAwesomeIcon icon={icon} />
-    </TabComp>
+    </ColouredTabComp>
   )
 }
 

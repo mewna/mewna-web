@@ -291,7 +291,7 @@ export default class extends Component {
               "medal",
               "/premium",
               this.props.currentPath,
-              {color: "gold"}
+              true
             ) : ""}
           </TabsBar>
         </Card>
