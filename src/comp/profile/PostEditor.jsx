@@ -15,15 +15,20 @@ export default class extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      postData: this.props.postData || "",
+      postData: this.props.postData,
       write: true,
       postLengthWarning: false,
+      rerender: false,
     }
+  }
+
+  clear() {
+    this.setState({postData: "", rerender: !this.state.rerender})
   }
 
   render() {
     let warning = ""
-    if(this.state.postLengthWarning) {
+    if(this.state.postLengthWarning || this.state.rerender !== this.state.rerender) {
       warning = $("en_US", "profile.post.too-short").replace("$number", MIN_POST_LENGTH)
     }
     let cancelButton = ""
@@ -58,7 +63,7 @@ export default class extends Component {
               })
             } else {
               this.props.postCallback && this.props.postCallback(this.state.postData)
-              this.setState({postData: ""})
+              this.clear()
             }
           }}>Post</Button>
           {cancelButton}

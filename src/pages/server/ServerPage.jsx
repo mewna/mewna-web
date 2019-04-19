@@ -207,7 +207,7 @@ export default withToastManager(class extends Component {
     return (
       <Container>
         <Helmet>
-          <title>Mewna :: {this.state.cache.guild.name || "Unknown server"}</title>
+          <title>Mewna :: {this.state.cache.guild.name || "Unknown server"}'s page</title>
         </Helmet>
         <ServerHeader
           serverId={this.props.match.params.id}
@@ -238,6 +238,7 @@ export default withToastManager(class extends Component {
             } else {
               this.setState({editing: false}, async () => {
                 await this.updateRender()
+                success(this, $("en_US", "profile.edit.saved"))
               })
               return true
             }

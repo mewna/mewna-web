@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import regeneratorRuntime from "regenerator-runtime"
 import Container from "./Container"
 import FlexPadder from "./FlexPadder"
-import NavLink from "./NavLink"
+import NavLink, { ExternalLink } from "./NavLink"
 import LoginButton from "./navbar/LoginButton"
 import UserMenu from "./navbar/UserMenu"
 import { HiddenMobile } from "./HiddenMobile"
@@ -12,6 +12,7 @@ import styled from "@emotion/styled"
 
 import store from "../Storage"
 import api from "../Api"
+import $ from "../Translate"
 
 const topBorder = props => {
   return css`
@@ -81,21 +82,26 @@ export default class Navbar extends Component {
       <Bar>
         <Container>
           <NavTitle>
-            <NavLink nounderline="true" to={"/"}>
+            <NavLink nounderline="true" to="/">
               Mewna!
             </NavLink>
           </NavTitle>
           <FlexPadder />
           <HiddenMobile>
             <NavItem>
-              <NavLink nounderline="true" to={"/docs"}>
-                Docs
+              <NavLink nounderline="true" to="/docs">
+                {$("en_US", "menu.docs")}
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink nounderline="true" to={"/"}>
-                Premium
+              <NavLink nounderline="true" to="/">
+              {$("en_US", "menu.premium")}
               </NavLink>
+            </NavItem>
+            <NavItem>
+              <ExternalLink nounderline="true" href="https://discord.gg/UwdDN6r" target="_blank" rel="noopener noreferrer">
+              {$("en_US", "menu.community")}
+              </ExternalLink>
             </NavItem>
           </HiddenMobile>
           {this.renderUserMenu()}

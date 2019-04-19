@@ -5,12 +5,13 @@ import Textbox from "./Textbox"
 export default class extends Component {
   constructor(props) {
     super(props)
+    const len = this.props.debounce || 500
     if (props.callback) {
-      this.handleChangeInternal = debounce(500, false, this.props.callback)
+      this.handleChangeInternal = debounce(len, false, this.props.callback)
     } else {
-      this.handleChangeInternal = debounce(500, false, e => {})
+      this.handleChangeInternal = debounce(len, false, e => {})
     }
-    this.state = { value: props.value || "" }
+    this.state = { value: this.props.value || "" }
   }
 
   handleChange(e) {

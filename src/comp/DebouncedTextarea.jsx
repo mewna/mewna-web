@@ -36,6 +36,15 @@ export default class DebouncedTextarea extends Component {
     }
   }
 
+  componentDidUpdate(prev) {
+    // If we previously had a value on this textarea, and we're currently
+    // holding a value in it, but then the value prop got cleared, we need to
+    // clear this textarea's value.
+    if(prev.value && !this.props.value && this.state.textareaValue) {
+      this.setState({textareaValue: ""})
+    }
+  }
+
   handleChange(e) {
     // noinspection JSUnresolvedVariable
     let input = e.target.value

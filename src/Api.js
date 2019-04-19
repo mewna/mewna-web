@@ -144,6 +144,24 @@ class Api {
     })
   }
 
+  //////////////
+  // ACCOUNTS //
+  //////////////
+
+  async getUser(hostname, id) {
+    return await this.request(async () => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/user/${id}`)
+      return out.data
+    })
+  }
+
+  async updateUser(hostname, id, data) {
+    return await this.authRequest(async headers => {
+      const out = await axios.post(`${backendUrl(hostname)}/api/user/${id}`, data, {headers: headers})
+      return out.data
+    })
+  }
+
   ///////////
   // POSTS //
   ///////////

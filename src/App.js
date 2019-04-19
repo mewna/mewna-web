@@ -26,6 +26,7 @@ import Index from "./pages/Index"
 import Docs from "./pages/Docs"
 import Placeholder from "./pages/Placeholder"
 import ServerPage from "./pages/server/ServerPage"
+import UserPage from "./pages/user/UserPage"
 
 
 // TODO: OpenGraph: http://ogp.me
@@ -165,8 +166,8 @@ export default class App extends Component {
               
               <MewnaRoute exact path="/server/:id/:key?/:subkey?" component={ServerPage} />
 
-              <MewnaRoute exact path="/user/:id" component={Placeholder} />
-              <MewnaRoute exact path="/user/:id/:post" component={Placeholder} />
+              <MewnaRoute exact path="/user/:id" component={UserPage} />
+              <MewnaRoute exact path="/user/:id/:post" component={UserPage} />
             </Switch>
           </ToastProvider>
         </>

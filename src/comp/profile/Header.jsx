@@ -1,10 +1,26 @@
+import React from "react"
 import { css } from "@emotion/core"
 import styled from "@emotion/styled"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 import hiddenMobile from "../HiddenMobile"
 import NavLink from "../NavLink"
 import { darkBackground, lightBackground, hoverBackground } from "../Utils"
 import BaseProfileIcon from "./Icon"
+
+export const renderTab = (title, icon, route, currentPath, styles) => {
+  let TabComp
+  if (route.match(/^\/server\/\d+\/?$/)) {
+    TabComp = currentPath === route || currentPath.match(/^\/server\/\d+\/\d+$/) ? SelectedTab : Tab
+  } else {
+    TabComp = currentPath.startsWith(route) ? SelectedTab : Tab
+  }
+  return (
+    <TabComp to={route} nounderline="true" style={styles || {}}>
+      <HiddenTabText>{title}</HiddenTabText> <FontAwesomeIcon icon={icon} />
+    </TabComp>
+  )
+}
 
 export const HeaderContainer = styled.div`
   width: 100%;
@@ -15,11 +31,13 @@ export const HeaderContainer = styled.div`
     margin-top: 0.5rem;
   }
 `
+
 export const backgroundImage = props => {
   return css`
     background-image: url("${props.background}");
   `
 }
+
 export const Header = styled.div`
   width: 100%;
   height: 24rem;

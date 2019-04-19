@@ -5,8 +5,9 @@ import FlexPadder from "../FlexPadder"
 import { NavMenuButton } from "./NavButton"
 import store from "../../Storage"
 import api from "../../Api"
+import $ from "../../Translate"
 import { HiddenDesktop } from "../HiddenDesktop"
-import NavLink from "../NavLink"
+import NavLink, { ExternalLink } from "../NavLink"
 
 const Holder = styled.div`
   display: flex;
@@ -88,17 +89,29 @@ class UserMenu extends Component {
     if(this.state.expanded) {
       return (
         <Menu>
-          <NavMenuButton onClick={() => this.toggleTheme()} nounderline="true">Change theme</NavMenuButton>
+          <NavMenuButton onClick={() => this.toggleTheme()} nounderline="true">
+            {$("en_US", "menu.toggle-theme")}
+          </NavMenuButton>
+          <NavMenuButton>
+              <NavLink nounderline="true" to={`/user/${this.props.user.id}`}>
+                {$("en_US", "menu.my-profile")}
+              </NavLink>
+            </NavMenuButton>
           <HiddenDesktop style={{display: "flex", flexDirection: "column"}}>
             <NavMenuButton>
-              <NavLink nounderline="true" to={"/docs"}>
-                Docs
+              <NavLink nounderline="true" to="/docs">
+                {$("en_US", "menu.docs")}
               </NavLink>
             </NavMenuButton>
             <NavMenuButton>
-              <NavLink nounderline="true" to={"/"}>
-                Premium
+              <NavLink nounderline="true" to="/">
+              {$("en_US", "menu.premium")}
               </NavLink>
+            </NavMenuButton>
+            <NavMenuButton>
+              <ExternalLink nounderline="true" href="https://discord.gg/UwdDN6r" target="_blank" rel="noopener noreferrer">
+              {$("en_US", "menu.community")}
+              </ExternalLink>
             </NavMenuButton>
           </HiddenDesktop>
           <NavMenuButton onClick={() => this.logout()} nounderline="true">Log out</NavMenuButton>

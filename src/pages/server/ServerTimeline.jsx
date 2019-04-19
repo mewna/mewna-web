@@ -128,80 +128,78 @@ export default withRouter(withToastManager(class extends Component {
   }
 
   renderPost(post, key) {
-    if(true) {
-      let bkey = 0
-      const currentPostAuthor = this.state.currentPostAuthor.id ? this.state.currentPostAuthor : null
-      return renderPost(post, key, currentPostAuthor, this.props.authors, () => {
-        if(post.content.text) {
-          let viewButton = (
-            <NavButton to={`/server/${this.props.cache.guild.id}/${post.id}`} nounderline="true" key={bkey++}>View</NavButton>
-          )
+    let bkey = 0
+    const currentPostAuthor = this.state.currentPostAuthor && this.state.currentPostAuthor.id ? this.state.currentPostAuthor : null
+    return renderPost(post, key, currentPostAuthor, this.props.authors, () => {
+      if(post.content.text) {
+        let viewButton = (
+          <NavButton to={`/server/${this.props.cache.guild.id}/${post.id}`} nounderline="true" key={bkey++}>View</NavButton>
+        )
+        if(this.state.currentPost) {
+          viewButton = ""
+        }
+        let deleteButton = ""
+        let editButton = ""
+        if(this.props.manages) {
+          let styles = {}
           if(this.state.currentPost) {
-            viewButton = ""
-          }
-          let deleteButton = ""
-          let editButton = ""
-          if(this.props.manages) {
-            let styles = {}
-            if(this.state.currentPost) {
-              if(api.userId() === this.state.currentPostAuthor.id) {
-                editButton = (
-                  <Button onClick={() => {
-                    this.setState({editingCurrentPost: true})
-                  }} key={bkey++}>
-                    Edit
-                  </Button>
-                )
-              } else {
-                styles = {
-                  marginLeft: 0,
-                }
+            if(api.userId() === this.state.currentPostAuthor.id) {
+              editButton = (
+                <Button onClick={() => {
+                  this.setState({editingCurrentPost: true})
+                }} key={bkey++}>
+                  Edit
+                </Button>
+              )
+            } else {
+              styles = {
+                marginLeft: 0,
               }
             }
-            deleteButton = (
-              <DeleteButton style={styles} onClick={async () => {
-                await api.deletePost(api.clientHostname(), this.props.cache.guild.id, post.id)
-                this.props.updateRender()
-                if(this.state.currentPost) {
-                  this.props.history.push(`/server/${this.props.cache.guild.id}`)
-                }
-                success(this, $("en_US", "profile.post.delete"))
-              }} key={bkey++}>
-                <FontAwesomeIcon icon={"trash"} />
-              </DeleteButton>
-            )
           }
-          return [viewButton, editButton, deleteButton]
-        } else {
-          return []
+          deleteButton = (
+            <DeleteButton style={styles} onClick={async () => {
+              await api.deletePost(api.clientHostname(), this.props.cache.guild.id, post.id)
+              this.props.updateRender()
+              if(this.state.currentPost) {
+                this.props.history.push(`/server/${this.props.cache.guild.id}`)
+              }
+              success(this, $("en_US", "profile.post.delete"))
+            }} key={bkey++}>
+              <FontAwesomeIcon icon={"trash"} />
+            </DeleteButton>
+          )
         }
-      }, (type, keys) => {
-        switch(type) {
-          case "event.server.name": {
-            return {
-              "name": this.props.cache.guild.name
-            }
-          }
-          case "event.server.description": {
-            return {
-              "name": this.props.cache.guild.name
-            }
-          }
-          case "event.server.background": {
-            return {
-              "name": this.props.cache.guild.name
-            }
+        return [viewButton, editButton, deleteButton]
+      } else {
+        return []
+      }
+    }, (type, data, keys) => {
+      switch(type) {
+        case "event.server.name": {
+          return {
+            "name": this.props.cache.guild.name
           }
         }
-      })
-    }
+        case "event.server.description": {
+          return {
+            "name": this.props.cache.guild.name
+          }
+        }
+        case "event.server.background": {
+          return {
+            "name": this.props.cache.guild.name
+          }
+        }
+      }
+    })
   }
 
   renderEditor() {
     if(this.props.manages) {
       return (
         <PostEditor
-          postData={this.state.currentPost.content.text.content}
+          postData={this.state.currentPost ? this.state.currentPost.content.text.content : ""}
           isEdit={this.state.currentPost && this.state.editingCurrentPost}
           cancelCallback={() => {
             this.setState({editingCurrentPost: false, postData: this.state.currentPost.content.text.content})

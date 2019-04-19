@@ -45,7 +45,7 @@ export const renderSystemPostText = (type, data) => {
       return $("en_US", "profile." + type)
         .replace("$name", data.name)
         .replace("$old", data.old)
-        .replace("$new", data.newName)
+        .replace("$new", data.new)
     }
     case "event.server.name": {
       return $("en_US", "profile." + type)
@@ -108,38 +108,38 @@ export const renderPost = (post, key, currentPostAuthor, authors, buttons, forma
     let styles = {display: "flex", flexDirection: "row"}
     switch(data.type) {
       case "event.levels.global": {
-        formats = renderFormats(format, data.type, ["name"])
+        formats = renderFormats(format, data, ["name", "level"])
         break
       }
       case "event.money": {
-        formats = renderFormats(format, data.type, ["name", "money"])
+        formats = renderFormats(format, data, ["name", "money"])
         break
       }
       case "event.account.background": {
-        formats = renderFormats(format, data.type, ["name"])
+        formats = renderFormats(format, data, ["name"])
         styles = Object.assign(styles, {
           background: `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("${backgroundLookup(data.bg)}") center / cover`
         })
         break
       }
       case "event.account.description": {
-        formats = renderFormats(format, data.type, ["name"])
+        formats = renderFormats(format, data, ["name"])
         break
       }
       case "event.account.displayName": {
-        formats = renderFormats(format, data.type, ["name", "old", "newName"])
+        formats = renderFormats(format, data, ["name", "old", "newName"])
         break
       }
       case "event.server.name": {
-        formats = renderFormats(format, data.type, ["name"])
+        formats = renderFormats(format, data, ["name"])
         break
       }
       case "event.server.description": {
-        formats = renderFormats(format, data.type, ["name"])
+        formats = renderFormats(format, data, ["name"])
         break
       }
       case "event.server.background": {
-        formats = renderFormats(format, data.type, ["name"])
+        formats = renderFormats(format, data, ["name"])
         styles = Object.assign(styles, {
           background: `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("${backgroundLookup(data.bg)}") center / cover`
         })
@@ -152,8 +152,8 @@ export const renderPost = (post, key, currentPostAuthor, authors, buttons, forma
   }
 }
 
-const renderFormats = (f, type, keys) => {
-  const out = f(type, keys)
+const renderFormats = (f, data, keys) => {
+  const out = f(data.type, data, keys)
   return Object.assign({}, out)
 }
 

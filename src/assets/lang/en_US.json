@@ -72,7 +72,8 @@
       "background": "Click to change background image",
       "premium-backgrounds": "Upgrade to Mewna Premium to get more backgrounds, or upload your own!",
       "background-upload": "Upload your own",
-      "bad-config": "Your settings are invalid. Make sure that you haven't left anything blank."
+      "bad-config": "Your settings are invalid. Make sure that you haven't left anything blank.",
+      "saved": "Profile saved."
     },
     "post": {
       "no-content": "No post content.",
@@ -95,6 +96,14 @@
         "background": "$server's background was updated."
       }
     }
+  },
+  "menu": {
+    "docs": "Docs",
+    "premium": "Premium",
+    "community": "Community",
+    "my-profile": "My profile",
+    "toggle-theme": "Toggle light theme",
+    "logout": "Log out"
   },
   "commands": {
     "economy": {

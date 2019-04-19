@@ -1,23 +1,26 @@
 import React, { Component } from "react"
 import regeneratorRuntime from "regenerator-runtime"
+import styled from "@emotion/styled"
+import Modal from "@bdenzer/react-modal"
+
 import {
   Header,
+  renderTab,
   HeaderContainer,
   TabsBar,
   ProfileName,
   ProfileNameWrapper,
-  ProfileIcon,
-  renderTab
+  ProfileIcon
 } from "./Header"
 import Card from "../Card"
-import { FlexPadderDesktop } from "../FlexPadder"
-import $ from "../../Translate"
 import Button from "../Button"
-import styled from "@emotion/styled"
-import Modal from "@bdenzer/react-modal"
+import api from "../../Api"
 import lookupBackground, { defaultBackgrounds, premiumBackgrounds } from "../../Backgrounds"
 import { ThreeColGrid } from "../GridContainer"
+import $ from "../../Translate"
 import { lightBackground } from "../Utils"
+import DebouncedTextbox from "../DebouncedTextbox"
+import mewna from "../../assets/mewna-avatar.png"
 
 const MewnaModalWrapper = styled.div`
 & > #modal-modalBackground > #modal-modalInner > #modal-modalBody,
@@ -38,23 +41,10 @@ const MewnaModalWrapper = styled.div`
 }
 `
 
-const renderSettingsTab = (manages, serverId, currentPath) => {
-  if(manages) {
-    return (
-      <>
-        <FlexPadderDesktop />
-        {renderTab(
-          "Settings",
-          "cogs",
-          `/server/${serverId}/edit`,
-          currentPath
-        )}
-      </>
-    )
-  } else {
-    return ""
-  }
-}
+const BackgroundGrid = styled(ThreeColGrid)`
+  grid-template-rows: 3em;
+  grid-auto-rows: 3em;
+`
 
 const BackgroundEditCover = styled.div`
   position: absolute;
@@ -72,11 +62,6 @@ const BackgroundEditCover = styled.div`
   @media screen and (max-width: 768px) {
     padding-top: 2em;
   }
-`
-
-const BackgroundGrid = styled(ThreeColGrid)`
-  grid-template-rows: 3em;
-  grid-auto-rows: 3em;
 `
 
 const BackgroundCard = styled.div`
@@ -163,23 +148,6 @@ class BackgroundModal extends Component {
   }
 }
 
-const OneButtonWrapper = styled.div`
-  @media screen and (max-width: 768px) {
-    margin-top: 0.5em;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-column-gap: 0.5em;
-  }
-`
-const TwoButtonWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-column-gap: 0.5em;
-  @media screen and (max-width: 768px) {
-    margin-top: 0.5em;
-  }
-`
-
 export default class extends Component {
   constructor(props) {
     super(props)
@@ -187,6 +155,7 @@ export default class extends Component {
       editing: false,
       customBackground: this.props.customBackground,
       backgroundModal: false,
+      displayName: this.props.displayName,
     }
   }
 
@@ -199,21 +168,44 @@ export default class extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps.customBackground && prevProps.customBackground !== this.props.customBackground) {
+    if(this.props.customBackground && prevProps.customBackground !== this.props.customBackground) {
       this.setState({customBackground: this.props.customBackground})
+    }
+    if(this.props.displayName && prevProps.displayName !== this.props.displayName) {
+      this.setState({displayName: this.props.displayName})
     }
   }
   
   fetchEdits() {
-    return {customBackground: this.state.customBackground}
+    return {customBackground: this.state.customBackground, displayName: this.state.displayName}
   }
 
   resetEdits() {
-    this.setState({customBackground: this.props.customBackground})
+    this.setState({customBackground: this.props.customBackground, displayName: this.props.displayName})
   }
 
-  renderEditButton(route) {
-    if(this.props.manages && (route.match(/^\/server\/\d+\/?$/) || route.match(/^\/server\/\d+\/\d+$/))) {
+  renderBackground() {
+    if(this.state.editing) {
+      let bg = this.state.customBackground || this.props.customBackground
+      if(typeof bg === "string" && bg.startsWith("/backgrounds/")) {
+        bg = lookupBackground(bg)
+      }
+      return (
+        <div style={{position: "relative"}}>
+          <Header background={bg} style={{filter: "brightness(0.5)"}} />
+          <BackgroundEditCover onClick={() => this.setState({backgroundModal: true})}>
+            {$("en_US", "profile.edit.background")}
+          </BackgroundEditCover>
+        </div>
+      )
+    } else {
+      return <Header background={this.props.customBackground} />
+    }
+  }
+
+  renderEditButton() {
+    // stupid hack because APPARENTLY atob doesn't exist on the server.........
+    if(typeof window !== "undefined" && this.props.userId === api.userId()) {
       if(this.state.editing) {
         return (
           <TwoButtonWrapper>
@@ -250,22 +242,25 @@ export default class extends Component {
     }
   }
 
-  renderBackground() {
+  renderName() {
     if(this.state.editing) {
-      let bg = this.state.customBackground || this.props.customBackground
-      if(typeof bg === "string" && bg.startsWith("/backgrounds/")) {
-        bg = lookupBackground(bg)
-      }
       return (
-        <div style={{position: "relative"}}>
-          <Header background={bg} style={{filter: "brightness(0.5)"}} />
-          <BackgroundEditCover onClick={() => this.setState({backgroundModal: true})}>
-            {$("en_US", "profile.edit.background")}
-          </BackgroundEditCover>
-        </div>
+        <DebouncedTextbox
+          value={this.state.displayName}
+          debounce={10}
+          style={{marginRight: "0.5em"}}
+          maxLength={32}
+          callback={e => {
+            this.setState({displayName: e.value})
+          }}
+        />
       )
     } else {
-      return <Header background={this.props.customBackground} />
+      return (
+        <ProfileName>
+          {this.props.displayName || "Unknown user"}
+        </ProfileName>
+      )
     }
   }
 
@@ -280,30 +275,44 @@ export default class extends Component {
             closeModal={() => this.setState({backgroundModal: false})}
           />
           <TabsBar>
-            <ProfileIcon src={this.props.serverIcon} alt="server icon" />
+            <ProfileIcon src={this.props.avatar || mewna} alt="avatar" />
             <ProfileNameWrapper>
-              <ProfileName>
-                {this.props.serverName}
-              </ProfileName>
-              {this.renderEditButton(this.props.currentPath)}
+              {this.renderName()}
+              {this.renderEditButton()}
             </ProfileNameWrapper>
             {renderTab(
               "Timeline",
               "newspaper",
-              `/server/${this.props.serverId}`,
+              `/user/${this.props.userId}`,
               this.props.currentPath
             )}
-            {/*renderTab("About", "user", `/server/${this.props.serverId}/about`, this.props.currentPath)*/}
-            {renderTab(
-              "Leaderboard",
-              "trophy",
-              `/server/${this.props.serverId}/leaderboard`,
-              this.props.currentPath
-            )}
-            {renderSettingsTab(this.props.manages, this.props.serverId, this.props.currentPath)}
+            {(typeof window !== "undefined" && this.props.userId === api.userId()) ? renderTab(
+              "Premium",
+              "medal",
+              "/premium",
+              this.props.currentPath,
+              {color: "gold"}
+            ) : ""}
           </TabsBar>
         </Card>
       </HeaderContainer>
     )
   }
 }
+
+const OneButtonWrapper = styled.div`
+  @media screen and (max-width: 768px) {
+    margin-top: 0.5em;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-column-gap: 0.5em;
+  }
+`
+const TwoButtonWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 0.5em;
+  @media screen and (max-width: 768px) {
+    margin-top: 0.5em;
+  }
+`

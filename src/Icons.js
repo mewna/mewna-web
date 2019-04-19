@@ -4,9 +4,10 @@ import {
   faNewspaper,
   faUser,
   faTrophy,
-  faTrash
+  faTrash,
+  faMedal
 } from "@fortawesome/free-solid-svg-icons"
 
 export default () => {
-  library.add(faCogs, faNewspaper, faUser, faTrophy, faTrash)
+  library.add(faCogs, faNewspaper, faUser, faTrophy, faTrash, faMedal)
 }

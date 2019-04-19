@@ -15,6 +15,7 @@ const MewnaNavLink = styled(NavLink)`
 
   ${underlined}
 `
+export const ExternalLink = MewnaNavLink.withComponent("a")
 
 export default MewnaNavLink
 
