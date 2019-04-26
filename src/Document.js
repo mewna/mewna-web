@@ -12,6 +12,9 @@ import getTheme from "./Theme"
 import styled from "@emotion/styled"
 import { PaddedCard } from "./comp/Card"
 import { darkBackground } from "./comp/Utils"
+import setupIcons from "./Icons"
+
+setupIcons()
 
 const MewnaBaseToast = styled(PaddedCard)`
   width: 360px;
@@ -48,6 +51,7 @@ export default class extends Component {
     const { req, assets, data, renderPage } = ctx
     const context = {}
     const location = req.url
+    storage._setStore(req.universalCookies)
     const lightTheme = storage.getLightTheme(req.headers.host)
     const theme = getTheme(lightTheme)
     const page = await renderPage(App => props => (

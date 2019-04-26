@@ -86,6 +86,10 @@ export class Storage {
   update() {
     Object.keys(this.listeners).forEach(e => this.listeners[e].updateRender && this.listeners[e].updateRender())
   }
+
+  _setStore(store) {
+    this.cookies = store
+  }
 }
 
 const storage = new Storage()
