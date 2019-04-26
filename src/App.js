@@ -11,7 +11,6 @@ import { ThemeProvider } from "emotion-theming"
 import { Helmet } from "react-helmet"
 import merge from "lodash.merge"
 import { ToastProvider } from "react-toast-notifications"
-import reactTreeWalker from 'react-tree-walker'
 
 import getTheme from "./Theme"
 import storage from "./Storage"

@@ -1,7 +1,10 @@
 module.exports = {
-  presets: ["@babel/preset-react", "@babel/preset-env"],
+  presets: [
+    "razzle/babel",
+    "@babel/preset-react",
+    "@babel/preset-env"
+  ],
   plugins: [
-    "transform-inline-environment-variables",
     [
       "@babel/transform-react-jsx",
       {

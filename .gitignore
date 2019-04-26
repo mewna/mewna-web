@@ -1,3 +1,12 @@
-.rogue
-node_modules/
+logs
+*.log
+npm-debug.log*
+.DS_Store
+
+coverage
+node_modules
+build
+public/static
+.env.*.local
+
 yarn-error.log
