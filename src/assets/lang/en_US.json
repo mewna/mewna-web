@@ -67,6 +67,7 @@
   },
   "profile": {
     "about": "About $name",
+    "no-posts": "$name hasn't written anything yet.",
     "edit": {
       "background-modal": "Choose a background",
       "background": "Click to change background image",

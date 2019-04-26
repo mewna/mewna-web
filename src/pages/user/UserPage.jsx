@@ -8,10 +8,11 @@ import ProfileHeader from "../../comp/profile/ProfileHeader"
 import store from "../../Storage"
 import api from "../../Api"
 import Container from "../../comp/Container"
+import Button from "../../comp/Button"
 import backgroundLookup from "../../Backgrounds"
 import Grid, { SideGrid, ProfileGrid } from "../../comp/GridContainer"
 import SideCard from "../../comp/profile/SideCard"
-import { renderPost } from "../../comp/profile/Post"
+import { renderPost, NoPosts } from "../../comp/profile/Post"
 import PostEditor from "../../comp/profile/PostEditor"
 import DebouncedTextarea from "../../comp/DebouncedTextarea"
 import $ from "../../Translate"
@@ -19,6 +20,13 @@ import { success, error } from "../../Utils"
 import { NavButton } from "../../comp/NavLink"
 import DeleteButton from "../../comp/DeleteButton"
 
+import { faHeart } from "@fortawesome/free-solid-svg-icons"
+import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"
+import styled from "@emotion/styled"
+
+const BrandIcon = styled(FontAwesomeIcon)`
+  color: ${props => props.theme.colors.brand};
+`
 
 const MIN_POST_LENGTH = 100
 
@@ -45,13 +53,19 @@ export default withToastManager(class extends Component {
   }
 
   async updateRender() {
+    console.log("a")
     const host = api.clientHostname()
+    console.log("b")
     const user = await api.getUser(host, this.props.match.params.id)
+    console.log("c")
     const posts = await api.getPosts(host, this.props.match.params.id)
+    console.log("d")
     this.setState({
       user: user,
       posts: posts,
       aboutText: user.aboutText,
+    }, () => {
+      console.log("e")
     })
   }
 
@@ -114,6 +128,7 @@ export default withToastManager(class extends Component {
           </SideGrid>
           <Grid>
             {this.renderEditor()}
+            {this.renderNoPosts()}
             {this.renderPosts()}
           </Grid>
         </ProfileGrid>
@@ -133,6 +148,18 @@ export default withToastManager(class extends Component {
       )
     } else {
       return this.state.user.aboutText
+    }
+  }
+
+  renderNoPosts() {
+    if(this.state.posts.length === 0) {
+      return (
+        <NoPosts>
+          {$("en_US", "profile.no-posts").replace("$name", this.state.user.displayName || "Unknown user")}
+        </NoPosts>
+      )
+    } else {
+      return ""
     }
   }
 
@@ -188,7 +215,20 @@ export default withToastManager(class extends Component {
             </DeleteButton>
           )
         }
-        return [viewButton, editButton, deleteButton]
+        /*
+        const hearts = (
+          <>
+            <Button key={bkey++}>
+              <BrandIcon icon={faHeart} />
+            </Button>
+            <Button>
+              <FontAwesomeIcon icon={farHeart} />
+            </Button>
+          </>
+        )
+        */
+        const hearts = ""
+        return [viewButton, editButton, hearts, deleteButton]
       } else {
         return []
       }

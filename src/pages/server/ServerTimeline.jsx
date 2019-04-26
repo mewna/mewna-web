@@ -15,7 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { withRouter } from "react-router"
 import { success } from "../../Utils"
 import { withToastManager } from "react-toast-notifications"
-import { renderPost } from "../../comp/profile/Post"
+import { renderPost, NoPosts } from "../../comp/profile/Post"
 
 const MIN_POST_LENGTH = 100
 
@@ -105,6 +105,18 @@ export default withRouter(withToastManager(class extends Component {
     )
   }
 
+  renderNoPosts() {
+    if(this.props.posts.length === 0) {
+      return (
+        <NoPosts>
+          {$("en_US", "profile.no-posts").replace("$name", this.props.cache.guild.name || "Unknown server")}
+        </NoPosts>
+      )
+    } else {
+      return ""
+    }
+  }
+
   renderBody() {
     if(this.state.currentPost) {
       if(this.state.editingCurrentPost) {
@@ -117,6 +129,7 @@ export default withRouter(withToastManager(class extends Component {
         <>
           {this.renderEditor()}
           {this.renderPosts()}
+          {this.renderNoPosts()}
         </>
       )
     }

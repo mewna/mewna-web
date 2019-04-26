@@ -12,12 +12,11 @@ import lookupBackground from "../../Backgrounds"
 import groupBy from "lodash.groupby"
 
 import styled from "@emotion/styled"
-import Axios from "axios";
-import $ from "../../Translate";
+import $ from "../../Translate"
 import Container from "../../comp/Container"
 import storage from "../../Storage"
 import getTheme from "../../Theme"
-import FlexContainer, {DefaultFlexContainer} from "../../comp/FlexContainer";
+import FlexContainer, {DefaultFlexContainer} from "../../comp/FlexContainer"
 
 const LeaderboardGrid = styled(Grid)`
   width: 100%;

@@ -6,7 +6,7 @@ import FlexContainer, { DefaultFlexContainer } from "../../../comp/FlexContainer
 import FlexPadder from "../../../comp/FlexPadder"
 import PaddedButton from "../../../comp/Button"
 import $ from "../../../Translate"
-import { backendUrl, twitchClientId } from "../../../Const"
+import { backendUrl } from "../../../Const"
 import api from "../../../Api"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import DeleteButton from "../../../comp/DeleteButton"
@@ -16,7 +16,6 @@ import { withToastManager } from 'react-toast-notifications'
 import Select, { AsyncSelect } from "../../../comp/Select"
 import debounce from "debounce-promise"
 import styled from "@emotion/styled"
-import axios from "axios"
 import { TwitchFormat } from "./Formats"
 import DebouncedTextarea from "../../../comp/DebouncedTextarea"
 
@@ -146,12 +145,8 @@ export default withToastManager(class extends Component {
   }
 
   async twitchSearch(str) {
-    const results = await axios.get(`https://api.twitch.tv/helix/users?login=${str}`, {
-      headers: {
-        "Client-ID": twitchClientId,
-      }
-    })
-    return results.data.data.map(e => ({
+    const results = await api.twitchName(str)
+    return results.data.map(e => ({
       value: e.id,
       label: e.display_name,
       icon: e.profile_image_url,
@@ -164,13 +159,9 @@ export default withToastManager(class extends Component {
     let key = 0
     this.props.config.twitch.twitchStreamers.filter(e => !this.state.cache[e.id])
       .forEach(async e => {
-        const results = await axios.get(`https://api.twitch.tv/helix/users?id=${e.id}`, {
-          headers: {
-            "Client-ID": twitchClientId,
-          }
-        })
+        const results = await api.twitchId(e.id)
         const cache = this.state.cache
-        cache[e.id] = results.data.data.map(e => ({
+        cache[e.id] = results.data.map(e => ({
           value: e.id,
           label: e.display_name,
           icon: e.profile_image_url,

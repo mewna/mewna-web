@@ -180,3 +180,21 @@ const PostFooter = styled.div`
   margin-top: 0.5em;
   padding-top: 0.5em;
 `
+
+export const NoPosts = styled.div`
+  width: 100%;
+  height: 4em;
+  padding: 1em;
+  display: flex;
+  align-content: center;
+  align-items: center;
+  border: 4px dashed ${props => props.theme.colors.dark};
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  @media screen and (max-width: 768px) {
+    width: calc(100% - 2em);
+    margin-left: 1em;
+    margin-right: 1em;
+  }
+`

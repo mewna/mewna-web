@@ -1,20 +1,25 @@
 import regeneratorRuntime from "regenerator-runtime"
 import axios from "axios"
-import { backendUrl } from "./Const"
+import { backendUrl, twitchClientId } from "./Const"
 import store from "./Storage"
-import {backgroundImage} from "./comp/profile/Header";
 
 class Api {
   /////////////
   // HELPERS //
   /////////////
 
+  authorized = false
+
+  authorized() {
+    return this.authorized
+  }
+
   token() {
     return store.getToken()
   }
 
   userId() {
-    return atob(this.token().split(".")[0])
+    return this.authorized && this.token() ? atob(this.token().split(".")[0]) : null
   }
 
   clientHostname() {
@@ -54,8 +59,13 @@ class Api {
 
   async heartbeat(hostname) {
     return await this.authRequest(async headers => {
-      const out = await axios.get(`${backendUrl(hostname)}/api/auth/heartbeat`, {headers: headers})
-      return out.data
+      try {
+        const out = await axios.get(`${backendUrl(hostname)}/api/auth/heartbeat`, {headers: headers})
+        this.authorized = true
+        return out.data
+      } catch(e) {
+        this.authorized = false
+      }
     })
   }
 
@@ -236,6 +246,32 @@ class Api {
   async cachedRoles(hostname, id) {
     return await this.request(async () => {
       const out = await axios.get(`${backendUrl(hostname)}/api/cache/guild/${id}/roles`)
+      return out.data
+    })
+  }
+
+  ////////////
+  // Twitch //
+  ////////////
+
+  async twitchName(name) {
+    return await this.request(async () => {
+      const out = await axios.get(`https://api.twitch.tv/helix/users?login=${name}`, {
+        headers: {
+          "Client-ID": twitchClientId,
+        }
+      })
+      return out.data
+    })
+  }
+
+  async twitchId(id) {
+    return await this.request(async () => {
+      const out = await axios.get(`https://api.twitch.tv/helix/users?id=${e.id}`, {
+        headers: {
+          "Client-ID": twitchClientId,
+        }
+      })
       return out.data
     })
   }
