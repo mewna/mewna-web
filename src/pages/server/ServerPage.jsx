@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { Helmet } from "react-helmet"
-
+import { matchPath } from "react-router"
 import regeneratorRuntime from "regenerator-runtime"
 
 import mewna from "../../assets/mewna-avatar.png"
@@ -30,26 +30,50 @@ import Misc from "./settings/Misc"
 
 import styled from "@emotion/styled"
 
-export default withToastManager(class extends Component {
+const ServerPageInternal = withToastManager(class extends Component {
   constructor(props) {
     super(props)
     this.editRegistry = []
-    this.state = {
-      editing: false,
-      manages: false,
-      config: {},
-      leaderboard: [],
-      rewards: [],
-      prefix: "mew.",
-      info: {},
-      posts: [],
-      authors: {},
-      cache: {
-        guild: {},
-        channels: [],
-        roles: [],
-        webhooks: [],
-      },
+    if(props.cache) {
+      this.state = {
+        editing: false,
+        manages: this.props.manages,
+        config: this.props.config,
+        leaderboard: this.props.leaderboard,
+        rewards: this.props.rewards,
+        prefix: this.props.prefix,
+        info: this.props.info,
+        currentPost: this.props.currentPost,
+        currentPostAuthor: this.props.currentPostAuthor,
+        posts: this.props.posts,
+        authors: this.props.authors,
+        cache: {
+          guild: this.props.cache.guild,
+          channels: this.props.cache.channels,
+          roles: this.props.cache.roles,
+          webhooks: this.props.cache.webhooks,
+        },
+      }
+    } else {
+      this.state = {
+        editing: false,
+        manages: false,
+        config: {},
+        leaderboard: [],
+        rewards: [],
+        prefix: "mew.",
+        info: {},
+        currentPost: null,
+        currentPostAuthor: null,
+        posts: [],
+        authors: [],
+        cache: {
+          guild: {},
+          channels: {},
+          roles: {},
+          webhooks: {},
+        },
+      }
     }
   }
 
@@ -67,46 +91,27 @@ export default withToastManager(class extends Component {
     }
   }
 
+  async componentDidUpdate(prevProps) {
+    if(prevProps.match.params.key !== this.props.match.params.key) {
+      if(
+        // Previous props had a post and current one does not
+        (prevProps.match.params.key && /\d+/.test(prevProps.match.params.key) && !this.props.match.params.key)
+        ||
+        // Current props had a post and previous one does not
+        (this.props.match.params.key && /\d+/.test(this.props.match.params.key) && !prevProps.match.params.key)
+      ) {
+        await this.updateRender()
+      }
+    }
+  }
+
   async updateRender() {
     if(typeof window !== undefined) {
-      // TODO: Should wrap this in a Promise.all() to avoid running them one at a time
       const host = api.clientHostname()
       const id = this.props.match.params.id
-      const manages = await api.manages(host, id)
-      const config = manages ? await api.guildConfig(host, id) : {}
-      const leaderboard = await api.guildLeaderboard(host, id)
-      const rewards = await api.guildRewards(host, id)
-      const prefix = await api.guildPrefix(host, id).prefix || "mew."
-      const posts = await api.getPosts(host, id)
-      // Filter out unique authors from custom posts. This will let us avoid
-      // fetching info more than once for no reason :blobcatzippermouth:
-      const authors = [...new Set(posts.filter(e => e.content.text).map(e => e.content.text.author))]
-      let authorData = await Promise.all(authors.map(e => api.getAuthor(host, e)))
-      authorData = authorData.reduce((obj, item) => {
-        obj[item.id] = item
-        return obj
-      }, {})
-      const guild = await api.cachedGuild(host, id)
-      const channels = await api.cachedChannels(host, id)
-      const roles = await api.cachedRoles(host, id)
-      const webhooks = manages ? await api.guildWebhooks(host, id) : []
-      const info = await api.guildInfo(host, id)
-      this.setState({
-        manages: manages,
-        config: config,
-        leaderboard: leaderboard,
-        rewards: rewards,
-        prefix: prefix,
-        info: info,
-        posts: posts,
-        authors: authorData,
-        cache: {
-          guild: guild,
-          channels: channels,
-          roles: roles,
-          webhooks: webhooks,
-        },
-      })
+      const post = this.props.match.params.key
+      const newState = await this.props.fetchData(host, id, post)
+      this.setState(newState)
     }
   }
 
@@ -150,6 +155,8 @@ export default withToastManager(class extends Component {
         editUnregister={e => this.editUnregister(e)}
         posts={this.state.posts}
         authors={this.state.authors}
+        currentPost={this.state.currentPost}
+        currentPostAuthor={this.state.currentPostAuthor}
         postId={this.props.match.params.key}
         updateRender={() => this.updateRender()}
       />
@@ -286,6 +293,91 @@ export default withToastManager(class extends Component {
     return cards
   }
 })
+
+export default class ServerPage extends Component {
+  static async getInitialProps(ctx) {
+    const { req } = ctx
+    const match = ServerPage.computeParams(req.url)
+    const data = await ServerPage.fetchData(req.hostname, match.params.id, match.params.key)
+    return data
+  }
+
+  static computeParams(url) {
+    return matchPath(url, {
+        path: "/server/:id/:key?/:subkey?",
+        exact: true,
+        strict: false
+    }) || {params: {}} // If no match, return a default that won't cause null dereferences
+  }
+
+  static async fetchData(host, id, post) {
+    const manages = api.token() ? await api.manages(host, id) : await Promise.resolve(false)
+    const [
+      config,
+      leaderboard,
+      rewards,
+      prefix,
+      posts,
+      currentPost,
+      info,
+    ] = await Promise.all([
+      manages ? api.guildConfig(host, id) : Promise.resolve({}),
+      api.guildLeaderboard(host, id),
+      api.guildRewards(host, id),
+      api.guildPrefix(host, id).then(data => data.prefix || "mew."),
+      api.getPosts(host, id),
+      post && /\d+/.test(post) ? api.getPost(host, id, post) : Promise.resolve(null),
+      api.guildInfo(host, id),
+    ])
+    let currentPostAuthor
+    if(currentPost) {
+      currentPostAuthor = await api.getAuthor(host, currentPost.content.text.author)
+    }
+    // Filter out unique authors from custom posts. This will let us avoid
+    // fetching info more than once for no reason :blobcatzippermouth:
+    const authors = [...new Set(posts.filter(e => e.content.text).map(e => e.content.text.author))]
+    let authorData = await Promise.all(authors.map(e => api.getAuthor(host, e)))
+    authorData = authorData.reduce((obj, item) => {
+      obj[item.id] = item
+      return obj
+    }, {})
+    const [
+      guild,
+      channels,
+      roles,
+      webhooks
+    ] = await Promise.all([
+      api.cachedGuild(host, id),
+      api.cachedChannels(host, id),
+      api.cachedRoles(host, id),
+      manages ? api.guildWebhooks(host, id) : Promise.resolve([]),
+    ])
+    return {
+      manages: manages,
+      config: config,
+      leaderboard: leaderboard,
+      rewards: rewards,
+      prefix: prefix,
+      currentPost: currentPost,
+      currentPostAuthor: currentPostAuthor,
+      posts: posts,
+      info: info,
+      authors: authorData,
+      cache: {
+        guild: guild,
+        channels: channels,
+        roles: roles,
+        webhooks: webhooks,
+      },
+    }
+  }
+
+  render() {
+    return (
+      <ServerPageInternal fetchData={(host, id, post) => ServerPage.fetchData(host, id, post)}  {...this.props} />
+    )
+  }
+}
 
 const CommandCard = styled(PaddedCard)`
   display: flex;

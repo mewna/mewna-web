@@ -25,13 +25,14 @@ for(let i = 1; i <= 100; i++) {
 
 export default withToastManager(class extends Component {
   render() {
-    const everyone = this.props.cache.roles
-      .filter(e => e.name === "@everyone")
-      .map(e => ({value: e.id, label: e.name}))[0]
+    //const everyone = this.props.cache.roles
+    //  .filter(e => e.name === "@everyone")
+    //  .map(e => ({value: e.id, label: e.name}))[0]
     const roleOptions = this.props.cache.roles.map(e => ({value: e.id, label: e.name}))
       .filter(e => e.label !== "@everyone")
       .sort((a, b) => (a.label.toLowerCase() > b.label.toLowerCase()) ? 1 : ((b.label.toLowerCase() > a.label.toLowerCase()) ? -1 : 0))
-    roleOptions.unshift(everyone)
+    // roleOptions.unshift(everyone)
+    // console.log(roleOptions)
 
     return (
       <>

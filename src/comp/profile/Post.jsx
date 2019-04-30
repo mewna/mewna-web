@@ -80,11 +80,11 @@ export const renderUserPost = (key, author, date, markdown, buttons) => {
         <FlexPadder />
         {date}
       </PostHeader>
-      <div>
+      <PostBody>
         <Markdown>
           {markdown}
         </Markdown>
-      </div>
+      </PostBody>
       <PostFooter>
         {buttons}
       </PostFooter>
@@ -171,6 +171,12 @@ const PostHeaderAvatar = styled.img`
   height: 24px;
   margin-right: 0.5em;
   border-radius: 50%;
+`
+const PostBody = styled.div`
+  max-width: 100%;
+  overflow-x: auto;
+  min-width: 0;
+  word-break: break-all;
 `
 const PostFooter = styled.div`
   display: flex;

@@ -94,13 +94,13 @@ export default class Navbar extends Component {
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink nounderline="true" to="/">
-              {$("en_US", "menu.premium")}
+              <NavLink nounderline="true" to="/premium">
+                {$("en_US", "menu.premium")}
               </NavLink>
             </NavItem>
             <NavItem>
               <ExternalLink nounderline="true" href="https://discord.gg/UwdDN6r" target="_blank" rel="noopener noreferrer">
-              {$("en_US", "menu.community")}
+                {$("en_US", "menu.community")}
               </ExternalLink>
             </NavItem>
           </HiddenMobile>

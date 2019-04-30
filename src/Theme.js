@@ -1,5 +1,6 @@
 import palette from "./Palette"
-import storage from "./Storage"
+
+export const BRAND_COLOUR = "#DB325C"
 
 export default light => ({
   colors: {

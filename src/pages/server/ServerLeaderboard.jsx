@@ -6,7 +6,7 @@ import SideCard from "../../comp/profile/SideCard"
 import FlexPadder from "../../comp/FlexPadder"
 import Grid, { ProfileGrid, SideGrid } from "../../comp/GridContainer"
 import { SmallIcon } from "../../comp/profile/Icon"
-import NavLink from "../../comp/NavLink"
+import { NoPosts } from "../../comp/profile/Post"
 import { darkBackground, brandBackground, lightBackground } from "../../comp/Utils"
 import lookupBackground from "../../Backgrounds"
 import groupBy from "lodash.groupby"
@@ -111,7 +111,18 @@ export default class extends Component {
     }
   }
 
+  renderNoLevels() {
+    return (
+      <NoPosts>
+        {$("en_US", "levels.no-levels")}
+      </NoPosts>
+    )
+  }
+
   renderCards() {
+    if(this.props.leaderboard.length === 0) {
+      return this.renderNoLevels()
+    }
     const cards = []
     let key = 0
     this.props.leaderboard.forEach(e => {

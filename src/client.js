@@ -7,7 +7,9 @@ import routes from "./routes"
 import storage from "./Storage"
 import getTheme from "./Theme"
 import Navbar from "./comp/Navbar"
+import MewnaToast from "./comp/Toast"
 import { ThemeProvider } from "emotion-theming"
+import { ToastProvider } from "react-toast-notifications"
 import { Global, css } from "@emotion/core"
 
 import setupIcons from "./Icons"
@@ -59,8 +61,14 @@ ensureReady(routes).then(data => {
   hydrate(
     <BrowserRouter>
       <WrappedThemeProvider theme={theme}>
-        <Navbar />
-        <After data={data} routes={routes} />
+        <ToastProvider
+          components={{Toast: MewnaToast}}
+          autoDismissTimeout={5000}
+          placement="bottom-right"
+        >
+          <Navbar />
+          <After data={data} routes={routes} />
+        </ToastProvider>
       </WrappedThemeProvider>
     </BrowserRouter>,
     document.getElementById("root")

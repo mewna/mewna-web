@@ -23,23 +23,25 @@ export default withRouter(withToastManager(class extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      postData: "",
+      postData: this.props.currentPost ? this.props.currentPost.content.text.content : "",
       write: true,
       aboutText: this.props.info.aboutText,
       postLengthWarning: false,
-      currentPost: null,
-      currentPostAuthor: {},
+      currentPost: this.props.currentPost,
+      currentPostAuthor: this.props.currentPostAuthor,
       editingCurrentPost: false,
     }
   }
 
   async componentDidMount() {
     this.props.editRegister(this)
-    if(this.props.postId) {
-      const post = await api.getPost(api.clientHostname(), this.props.cache.guild.id, this.props.postId)
+    /*
+    if(this.props.currentPost) {
+      const post = this.props.currentPost
       const author = await api.getAuthor(api.clientHostname(), post.content.text.author)
       this.setState({currentPost: post, currentPostAuthor: author, editingCurrentPost: false, postData: post.content.text.content})
     }
+    */
   }
   
   componentWillUnmount() {

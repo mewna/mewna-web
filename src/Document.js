@@ -9,42 +9,12 @@ import { ToastProvider } from "react-toast-notifications"
 import Navbar from "./comp/Navbar"
 import storage from "./Storage"
 import getTheme from "./Theme"
-import styled from "@emotion/styled"
-import { PaddedCard } from "./comp/Card"
-import { darkBackground } from "./comp/Utils"
+
 import setupIcons from "./Icons"
+import Footer from "./comp/Footer"
+import MewnaToast from "./comp/Toast"
 
 setupIcons()
-
-const MewnaBaseToast = styled(PaddedCard)`
-  width: 360px;
-  line-height: 1.4;
-  min-height: 40px;
-  margin: 0.5em;
-  user-select: none;
-  ${darkBackground}
-
-  @media screen and (max-width: 768px) {
-    width: 100vw;
-    margin-top: 1em !important;
-    margin-bottom: -0.5em;
-    margin-right: -0.5em;
-    margin-left: 0;
-  }
-`
-const MewnaSuccessToast = styled(MewnaBaseToast)`
-`
-const MewnaErrorToast = styled(MewnaBaseToast)`
-`
-const MewnaToast = props => {
-  const { appearance, children } = props
-  const Comp = appearance == "error" ? MewnaErrorToast : MewnaSuccessToast
-  return (
-    <Comp onClick={() => props.onDismiss && props.onDismiss()}>
-      {children}
-    </Comp>
-  )
-}
 
 export default class extends Component {
   static async getInitialProps(ctx) {
@@ -78,9 +48,13 @@ export default class extends Component {
         <head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta charSet="utf-8" />
-          <title>Mewna</title>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          {helmet.title.toComponent()}
+          <meta name="copyright" content="(c) amy 2018 - present" />
+          <meta name="robots" content="index,follow" />
+          <meta name="theme-color" content="#db325c" />
+          <meta name="google-site-verification" content="-eXmBV1AjdB6VRfqMX4Dt803iuZ-6qcUhPmATiO5Zlk" />
+          <meta name="keywords" content="mewna,discord,discord bot" />
+          {helmet.title.toComponent() || <title>Mewna</title>}
           {helmet.meta.toComponent()}
           {helmet.link.toComponent()}
           {assets.client.css && (
@@ -105,11 +79,13 @@ export default class extends Component {
                 components={{Toast: MewnaToast}}
                 autoDismissTimeout={5000}
                 placement="bottom-right"
-              ></ToastProvider>
-              <AfterRoot />
-              <AfterData data={data} />
+              >
+                <AfterRoot />
+                <AfterData data={data} />
+              </ToastProvider>
             </>
           </ThemeProvider>
+          <Footer>(c) Mewna 2019</Footer>
           <script
             type="text/javascript"
             src={assets.client.js}

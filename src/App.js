@@ -91,9 +91,9 @@ export default class App extends Component {
     return {
       // Fetch from cookies ahead of time, that way the initial render will
       // always be correct
-      host: req.headers.host,
-      lightTheme: storage.getLightTheme(req.headers.host),
-    }
+     edi
+     edi
+    }edi
   }
 
   static async walkTreeForProps(ctx) {

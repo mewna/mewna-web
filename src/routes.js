@@ -1,6 +1,7 @@
 import React from "react"
 
 import { asyncComponent } from "@jaredpalmer/after"
+import Loading from "./comp/Loading"
 
 export default [
   {
@@ -8,7 +9,7 @@ export default [
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/Index"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
   {
@@ -16,7 +17,7 @@ export default [
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/Placeholder"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
   {
@@ -24,7 +25,7 @@ export default [
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/Docs"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
   {
@@ -32,7 +33,7 @@ export default [
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/Placeholder"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
   {
@@ -40,7 +41,7 @@ export default [
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/Placeholder"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
   {
@@ -48,7 +49,7 @@ export default [
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/Placeholder"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
 
@@ -57,7 +58,7 @@ export default [
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/Placeholder"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
   {
@@ -65,7 +66,7 @@ export default [
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/Placeholder"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
 
@@ -74,30 +75,22 @@ export default [
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/server/ServerPage"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
 
   {
-    path: "/user/:id",
+    path: "/user/:id/:post?",
     exact: true,
     component: asyncComponent({
       loader: () => import("./pages/user/UserPage"),
-      Placeholder: () => <div>...LOADING...</div>
-    }),
-  },
-  {
-    path: "/user/:id/:post",
-    exact: true,
-    component: asyncComponent({
-      loader: () => import("./pages/user/UserPage"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   },
   {
     component: asyncComponent({
       loader: () => import("./pages/NotFound"),
-      Placeholder: () => <div>...LOADING...</div>
+      Placeholder: () => <Loading />
     }),
   }
 ]

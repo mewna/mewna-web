@@ -1,25 +1,46 @@
 import regeneratorRuntime from "regenerator-runtime"
-import axios from "axios"
+import Axios from "axios"
 import { backendUrl, twitchClientId } from "./Const"
-import store from "./Storage"
+import msgpack from "msgpack-lite"
+import storage from "./Storage"
+
+const _atob = typeof atob !== "undefined" ? atob : str => {
+  return Buffer.from(str, 'base64').toString('binary')
+}
+
+const axios = Axios.create({
+  responseType: 'arraybuffer',
+  transformResponse: [
+    data => {
+      try {
+        const out = msgpack.decode(new Buffer(data))
+        return out
+      } catch(e) {
+        console.error(e)
+        return [-1]
+      }
+    }
+  ],
+  transformRequest: [
+    (data, _headers) => msgpack.encode(data)
+  ],
+  headers: {
+    "Accept": "application/x.vnd.mewna+b",
+    "Content-Type": "application/x.vnd.mewna+b",
+  }
+})
 
 class Api {
   /////////////
   // HELPERS //
   /////////////
 
-  authorized = false
-
-  authorized() {
-    return this.authorized
-  }
-
   token() {
-    return store.getToken()
+    return storage.getToken()
   }
 
   userId() {
-    return this.authorized && this.token() ? atob(this.token().split(".")[0]) : null
+    return this.token() ? _atob(this.token().split(".")[0]) : null
   }
 
   clientHostname() {
@@ -61,10 +82,9 @@ class Api {
     return await this.authRequest(async headers => {
       try {
         const out = await axios.get(`${backendUrl(hostname)}/api/auth/heartbeat`, {headers: headers})
-        this.authorized = true
         return out.data
       } catch(e) {
-        this.authorized = false
+        storage.setToken(null)
       }
     })
   }

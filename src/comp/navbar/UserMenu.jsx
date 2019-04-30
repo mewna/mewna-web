@@ -71,6 +71,14 @@ class UserMenu extends Component {
       return "png"
     }
   }
+
+  avatarUrl() {
+    if(this.props.user.avatar) {
+      return `https://cdn.discordapp.com/avatars/${this.props.user.id}/${this.props.user.avatar}.${this.avatarExtension()}`
+    } else {
+      return `https://cdn.discordapp.com/embed/avatars/${this.props.user.discriminator % 5}.png`
+    }
+  }
   
   handleClickOutside() {
     this.setState({expanded: false})
@@ -128,7 +136,7 @@ class UserMenu extends Component {
         e.preventDefault()
         this.setState({expanded: !this.state.expanded})
       }} expanded={this.state.expanded}>
-        <Avatar src={`https://cdn.discordapp.com/avatars/${this.props.user.id}/${this.props.user.avatar}.${this.avatarExtension()}`} />
+        <Avatar src={this.avatarUrl()} />
         <TextHolder>
           {this.props.user.username}
         </TextHolder>

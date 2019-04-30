@@ -204,8 +204,7 @@ export default class extends Component {
   }
 
   renderEditButton() {
-    // stupid hack because APPARENTLY atob doesn't exist on the server.........
-    if(typeof window !== "undefined" && this.props.userId === api.userId()) {
+    if(this.props.userId === api.userId()) {
       if(this.state.editing) {
         return (
           <TwoButtonWrapper>
@@ -286,7 +285,7 @@ export default class extends Component {
               `/user/${this.props.userId}`,
               this.props.currentPath
             )}
-            {(typeof window !== "undefined" && this.props.userId === api.userId()) ? renderTab(
+            {(this.props.userId === api.userId()) ? renderTab(
               "Premium",
               "medal",
               "/premium",

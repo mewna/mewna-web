@@ -63,7 +63,8 @@
     "how-it-works": "How Levels Work",
     "no-rewards": "$name has no role rewards set up.",
     "view-rank": "You can view your rank with $prefixrank.",
-    "exp-gain": "You gain a random amount of exp 10 and 25 per message. To prevent spamming, you can only gain exp once per minute."
+    "exp-gain": "You gain a random amount of exp 10 and 25 per message. To prevent spamming, you can only gain exp once per minute.",
+    "no-levels": "Nobody is ranked yet. Start chatting and level up!"
   },
   "profile": {
     "about": "About $name",

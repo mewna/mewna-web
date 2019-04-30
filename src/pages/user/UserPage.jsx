@@ -3,6 +3,7 @@ import regeneratorRuntime from "regenerator-runtime"
 import { Helmet } from "react-helmet"
 import { withToastManager } from 'react-toast-notifications'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { matchPath } from "react-router"
 
 import ProfileHeader from "../../comp/profile/ProfileHeader"
 import store from "../../Storage"
@@ -23,6 +24,7 @@ import DeleteButton from "../../comp/DeleteButton"
 import { faHeart } from "@fortawesome/free-solid-svg-icons"
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"
 import styled from "@emotion/styled"
+import Loading from "../../comp/Loading"
 
 const BrandIcon = styled(FontAwesomeIcon)`
   color: ${props => props.theme.colors.brand};
@@ -30,15 +32,15 @@ const BrandIcon = styled(FontAwesomeIcon)`
 
 const MIN_POST_LENGTH = 100
 
-export default withToastManager(class extends Component {
+const UserPageInternal = withToastManager(class extends Component {
   constructor(props) {
     super(props)
     this.editRegistry = []
     this.state = {
-      user: {},
-      posts: [],
+      user: this.props.user,
+      posts: this.props.posts,
       editing: false,
-      currentPost: null,
+      currentPost: this.props.currentPost,
       editingCurrentPost: false,
       aboutText: "",
     }
@@ -52,20 +54,19 @@ export default withToastManager(class extends Component {
     this.editRegistry = this.editRegistry.filter(x => x !== e)
   }
 
+  async componentDidUpdate(prevProps) {
+    if(prevProps.match.params.post !== this.props.match.params.post) {
+      await this.updateRender()
+    }
+  }
+
   async updateRender() {
-    console.log("a")
-    const host = api.clientHostname()
-    console.log("b")
-    const user = await api.getUser(host, this.props.match.params.id)
-    console.log("c")
-    const posts = await api.getPosts(host, this.props.match.params.id)
-    console.log("d")
+    const [user, posts, currentPost] = await this.props.fetchData(api.clientHostname(), this.props.match.params.id, this.props.match.params.post)
     this.setState({
       user: user,
       posts: posts,
+      currentPost: currentPost,
       aboutText: user.aboutText,
-    }, () => {
-      console.log("e")
     })
   }
 
@@ -79,10 +80,18 @@ export default withToastManager(class extends Component {
   }
 
   render() {
+    if(!this.state.user) {
+      return <Loading />
+    }
+    const title = `Mewna :: ${this.state.user.displayName || "Unknown user"}'s profile`
     return (
       <Container>
         <Helmet>
-          <title>Mewna :: {this.state.user.displayName || "Unknown user"}'s profile</title>
+          <title>{title}</title>
+          <meta property="og:title" content={title} />
+          <meta property="og:image" content={this.state.user.avatar || (this.state.user.discord ? this.state.user.discord.avatar : null)} />
+          <meta property="og:description" content={this.state.user.aboutText} />
+          <meta name="description" content={this.state.user.aboutText} />
         </Helmet>
         <ProfileHeader
           customBackground={backgroundLookup(this.state.user.customBackground || "/backgrounds/default/plasma")}
@@ -127,13 +136,29 @@ export default withToastManager(class extends Component {
             </SideCard>
           </SideGrid>
           <Grid>
-            {this.renderEditor()}
-            {this.renderNoPosts()}
-            {this.renderPosts()}
+            {this.renderTimeline()}
           </Grid>
         </ProfileGrid>
       </Container>
     )
+  }
+
+  renderTimeline() {
+    if(this.state.currentPost) {
+      if(this.state.editingCurrentPost) {
+        return this.renderEditor()
+      } else {
+        return this.renderPost(this.state.currentPost, 0)
+      }
+    } else {
+      return (
+        <>
+          {this.renderEditor()}
+          {this.renderNoPosts()}
+          {this.renderPosts()}
+        </>
+      )
+    }
   }
 
   renderAbout() {
@@ -168,108 +193,107 @@ export default withToastManager(class extends Component {
     return this.state.posts.map(e => this.renderPost(e, key++))
   }
 
+  renderUserPostButtons(post) {
+    if(post.content.text) {
+      let bkey = 0
+      let viewButton = (
+        <NavButton to={`/user/${this.state.user.id}/${post.id}`} nounderline="true" key={bkey++}>View</NavButton>
+      )
+      if(this.state.currentPost) {
+        viewButton = ""
+      }
+      let deleteButton = ""
+      let editButton = ""
+      if(api.userId() === this.state.user.id) {
+        let styles = {}
+        if(this.state.currentPost) {
+          editButton = (
+            <Button onClick={() => {
+              this.setState({editingCurrentPost: true})
+            }} key={bkey++}>
+              Edit
+            </Button>
+          )
+        }
+        deleteButton = (
+          <DeleteButton style={styles} onClick={async () => {
+            if(this.state.currentPost) {
+              this.props.history.push(`/user/${this.state.user.id}`)
+            }
+            await api.deletePost(api.clientHostname(), this.state.user.id, post.id)
+            this.updateRender()
+            success(this, $("en_US", "profile.post.delete"))
+          }} key={bkey++}>
+            <FontAwesomeIcon icon={"trash"} />
+          </DeleteButton>
+        )
+      }
+      /*
+      const hearts = (
+        <>
+          <Button key={bkey++}>
+            <BrandIcon icon={faHeart} />
+          </Button>
+          <Button>
+            <FontAwesomeIcon icon={farHeart} />
+          </Button>
+        </>
+      )
+      */
+      const hearts = ""
+      return [viewButton, editButton, hearts, deleteButton]
+    } else {
+      return []
+    }
+  }
+
+  renderSystemPostText(type, data, keys) {
+    switch(type) {
+      case "event.levels.global": {
+        return {
+          "name": this.state.user.displayName,
+          "level": data.level,
+        }
+      }
+      case "event.money": {
+        return {
+          "name": this.state.user.displayName,
+          "money": data.money,
+        }
+      }
+      case "event.account.background": {
+        return {
+          "name": this.state.user.displayName,
+        }
+      }
+      case "event.account.description": {
+        return {
+          "name": this.state.user.displayName,
+        }
+      }
+      case "event.account.displayName": {
+        return {
+          "name": this.state.user.displayName,
+          "old": data.old,
+          "new": data["new"]
+        }
+      }
+    }
+  }
+
   renderPost(post, key) {
-    let bkey = 0
     const currentPostAuthor = this.state.currentPostAuthor && this.state.currentPostAuthor.id ? this.state.currentPostAuthor : null
     const authors = {}
     const author = Object.assign({}, this.state.user)
     author.name = author.displayName
     authors[this.state.user.id] = author
-    return renderPost(post, key, currentPostAuthor, authors, () => {
-      if(post.content.text) {
-        let viewButton = (
-          <NavButton to={`/user/${this.state.user.id}/${post.id}`} nounderline="true" key={bkey++}>View</NavButton>
-        )
-        if(this.state.currentPost) {
-          viewButton = ""
-        }
-        let deleteButton = ""
-        let editButton = ""
-        if(typeof window !== "undefined" && api.userId() === this.state.user.id) {
-          let styles = {}
-          if(this.state.currentPost) {
-            if(api.userId() === this.state.currentPostAuthor.id) {
-              editButton = (
-                <Button onClick={() => {
-                  this.setState({editingCurrentPost: true})
-                }} key={bkey++}>
-                  Edit
-                </Button>
-              )
-            } else {
-              styles = {
-                marginLeft: 0,
-              }
-            }
-          }
-          deleteButton = (
-            <DeleteButton style={styles} onClick={async () => {
-              await api.deletePost(api.clientHostname(), this.state.user.id, post.id)
-              this.updateRender()
-              if(this.state.currentPost) {
-                this.props.history.push(`/user/${this.state.user.id}`)
-              }
-              success(this, $("en_US", "profile.post.delete"))
-            }} key={bkey++}>
-              <FontAwesomeIcon icon={"trash"} />
-            </DeleteButton>
-          )
-        }
-        /*
-        const hearts = (
-          <>
-            <Button key={bkey++}>
-              <BrandIcon icon={faHeart} />
-            </Button>
-            <Button>
-              <FontAwesomeIcon icon={farHeart} />
-            </Button>
-          </>
-        )
-        */
-        const hearts = ""
-        return [viewButton, editButton, hearts, deleteButton]
-      } else {
-        return []
-      }
-    }, (type, data, keys) => {
-      switch(type) {
-        case "event.levels.global": {
-          return {
-            "name": this.state.user.displayName,
-            "level": data.level,
-          }
-        }
-        case "event.money": {
-          return {
-            "name": this.state.user.displayName,
-            "money": data.money,
-          }
-        }
-        case "event.account.background": {
-          return {
-            "name": this.state.user.displayName,
-          }
-        }
-        case "event.account.description": {
-          return {
-            "name": this.state.user.displayName,
-          }
-        }
-        case "event.account.displayName": {
-          return {
-            "name": this.state.user.displayName,
-            "old": data.old,
-            "new": data["new"]
-          }
-        }
-      }
-    })
+    return renderPost(post, key, currentPostAuthor, authors, () => this.renderUserPostButtons(post),
+      (type, data, keys) => this.renderSystemPostText(type, data, keys))
   }
 
   renderEditor() {
     // tfw no atob
-    if(typeof window !== "undefined" && this.state.user.id === api.userId()) {
+    if(this.state.user.id === api.userId()) {
       return (
         <PostEditor
           postData={this.state.currentPost ? this.state.currentPost.content.text.content : ""}
@@ -278,32 +302,24 @@ export default withToastManager(class extends Component {
             this.setState({editingCurrentPost: false, postData: this.state.currentPost.content.text.content})
           }}
           postCallback={async postData => {
-            if(!postData || postData.length < MIN_POST_LENGTH) {
-              this.setState({postLengthWarning: true}, () => {
-                setTimeout(() => {
-                  this.setState({postLengthWarning: false})
-                }, 5000)
-              })
-            } else if(postData) {
-              // Post it!
-              const data = {
-                author: api.userId(),
-                content: postData,
-                boops: [],
-              }
-              if(this.state.editingCurrentPost) {
-                const out = await api.editPost(api.clientHostname(), this.props.cache.guild.id, this.props.postId, data)
-                this.setState({editingCurrentPost: false})
-                await this.props.updateRender()
-                const post = await api.getPost(api.clientHostname(), this.props.cache.guild.id, this.props.postId)
-                const author = await api.getAuthor(api.clientHostname(), post.content.text.author)
-                this.setState({currentPost: post, currentPostAuthor: author, editingCurrentPost: false, postData: post.content.text.content})
-              } else {
-                const out = await api.createPost(api.clientHostname(), this.state.user.id, data)
-                this.setState({postData: ""})
-                // TODO: Should this redirect to /server/:id/${out.id}?
-                this.updateRender()
-              }
+            // Post it!
+            const data = {
+              author: api.userId(),
+              content: postData,
+              boops: [],
+            }
+            if(this.state.editingCurrentPost) {
+              const out = await api.editPost(api.clientHostname(), this.props.match.params.id, this.props.match.params.post, data)
+              this.setState({editingCurrentPost: false})
+              await this.updateRender()
+              const post = await api.getPost(api.clientHostname(), this.props.match.params.id, this.props.match.params.post)
+              const author = await api.getAuthor(api.clientHostname(), post.content.text.author)
+              this.setState({currentPost: post, currentPostAuthor: author, editingCurrentPost: false, postData: post.content.text.content})
+            } else {
+              const out = await api.createPost(api.clientHostname(), this.props.match.params.id, data)
+              this.setState({postData: ""})
+              // TODO: Should this redirect to /server/:id/${out.id}?
+              this.updateRender()
             }
           }}
         />
@@ -313,3 +329,39 @@ export default withToastManager(class extends Component {
     }
   }
 })
+
+export default class UserPage extends Component {
+  static async getInitialProps(ctx) {
+    const { req } = ctx
+    const match = UserPage.computeParams(req.url)
+    const [user, posts, currentPost] = await UserPage.fetchData(req.hostname, match.params.id, match.params.post)
+    return {
+      user: user,
+      posts: posts,
+      currentPost: currentPost,
+    }
+  }
+
+  static computeParams(url) {
+    return matchPath(url, {
+        path: "/user/:id/:post?",
+        exact: true,
+        strict: false
+    }) || {params: {}} // If no match, return a default that won't cause null dereferences
+  }
+
+  static async fetchData(host, id, post) {
+    const [user, posts] = await Promise.all([
+      api.getUser(host, id),
+      api.getPosts(host, id)
+    ])
+    const currentPost = post ? await api.getPost(host, id, post) : null
+    return [user, posts, currentPost]
+  }
+
+  render() {
+    return (
+      <UserPageInternal fetchData={(host, id, post) => UserPage.fetchData(host, id, post)} {...this.props} />
+    )
+  }
+}
