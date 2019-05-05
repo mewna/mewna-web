@@ -16,6 +16,7 @@ import { toggleState, success, error } from "../../Utils"
 import { withToastManager } from 'react-toast-notifications'
 import $ from "../../Translate"
 import backgroundLookup from "../../Backgrounds"
+import Loading from "../../comp/Loading"
 
 import ServerTimeline from "./ServerTimeline"
 import ServerSettings from "./ServerSettings"
@@ -211,6 +212,11 @@ const ServerPageInternal = withToastManager(class extends Component {
   }
 
   render() {
+    if(!this.state.cache.guild.id) {
+      return (
+        <Loading />
+      )
+    }
     return (
       <Container>
         <Helmet>

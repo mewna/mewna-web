@@ -192,6 +192,13 @@ class Api {
     })
   }
 
+  async getGuilds(hostname) {
+    return await this.authRequest(async headers => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/auth/guilds/managed`, {headers: headers})
+      return out.data
+    })
+  }
+
   ///////////
   // POSTS //
   ///////////

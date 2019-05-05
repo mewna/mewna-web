@@ -48,7 +48,10 @@
         "prefix": "The prefix Mewna uses for commands. The default is mew., meaning that commands are run as mew.command. A prefix of ! would let you run commands as !command instead."
       },
       "levels": {
-        "mee6-import": "Import this server's levels and role rewards from MEE6. This overwrites old levels and cannot be undone. This may take several minutes to run.",
+        "mee6-import": {
+          "1": "Import this server's levels and role rewards from MEE6. This overwrites old levels and cannot be undone. This may take several minutes to run.",
+          "2": "Your levels will not be exactly the same, because Mewna's level calculation is somewhat different from MEE6's, but the amount of exp you have will be the same."
+        },
         "role-chooser": "Select a role from the dropdown to add it as a reward.",
         "level": "Level"
       },
@@ -98,6 +101,9 @@
         "background": "$server's background was updated."
       }
     }
+  },
+  "home": {
+    "no-posts": "None of your servers have posted anything yet..."
   },
   "menu": {
     "docs": "Docs",

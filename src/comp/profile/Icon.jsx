@@ -1,5 +1,4 @@
 import styled from "@emotion/styled"
-import { lightBackground } from "../Utils"
 
 const Icon = styled.img`
   border-radius: 50%;
@@ -11,6 +10,11 @@ const Icon = styled.img`
 export const SmallIcon = styled(Icon)`
   width: 64px;
   height: 64px;
+`
+
+export const VerySmallIcon = styled(Icon)`
+  width: 32px;
+  height: 32px;
 `
 
 export default Icon

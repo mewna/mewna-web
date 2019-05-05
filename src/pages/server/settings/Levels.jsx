@@ -99,7 +99,10 @@ export default withToastManager(class extends Component {
             <PaddedCard>
               <h4>Import MEE6 levels</h4>
               <p>
-                {$("en_US", "settings.desc.levels.mee6-import")}
+                {$("en_US", "settings.desc.levels.mee6-import.1")}
+              </p>
+              <p>
+                {$("en_US", "settings.desc.levels.mee6-import.2")}
               </p>
               <InternalWidthFixer>
                 <PaddedButton>Import</PaddedButton>

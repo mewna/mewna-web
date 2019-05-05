@@ -56,8 +56,7 @@ export default class Navbar extends Component {
 
   async componentDidMount() {
     store.register(this)
-    const user = await api.heartbeat(api.clientHostname())
-    this.setState({user: user})
+    await this.updateRender()
   }
 
   componentWillUnmount() {
@@ -83,7 +82,7 @@ export default class Navbar extends Component {
         <Container>
           <NavTitle>
             <NavLink nounderline="true" to="/">
-              Mewna!
+              Mewna!<small style={{fontSize: "0.4em"}}>alpha</small>
             </NavLink>
           </NavTitle>
           <FlexPadder />

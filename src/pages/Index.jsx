@@ -3,20 +3,41 @@ import React, { Component } from "react"
 import { Box, Image, Heading, Text } from "@rebass/emotion"
 
 import { Helmet } from "react-helmet"
+import { Redirect } from "react-router"
 
 import Container from "../comp/Container"
-import Link from "../comp/Link"
 import NavLink from "../comp/NavLink"
 import Card from "../comp/Card"
-
 import storage from "../Storage"
 
 import photo from "../assets/mewna.svg"
 
 export default class Index extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      forceRerender: false
+    }
+  }
+
+  componentDidMount() {
+    storage.register(this)
+  }
+
+  componentWillUnmount() {
+    storage.unregister(this)
+  }
+
+  updateRender() {
+    this.setState({forceRerender: !this.state.forceRerender})
+  }
+
   render() {
+    if(storage.getToken()) {
+      return <Redirect to="/home" />
+    }
     return (
-      <Container>
+      <Container fakeProp={this.state.forceRerender}>
         <Helmet>
           <title>Mewna :: Engage your community</title>
         </Helmet>

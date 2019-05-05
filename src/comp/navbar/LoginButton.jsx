@@ -25,7 +25,7 @@ export default class extends Component {
   createOAuthDialog(e) {
     e.preventDefault()
     if (typeof window !== undefined) {
-      const hostname = window && window.location && window.location.hostname
+      const hostname = api.clientHostname()
       window.open(
         `${backendUrl(hostname)}/api/oauth/login/start`,
         "Discord login",

@@ -57,9 +57,9 @@ export default [
     path: "/home",
     exact: true,
     component: asyncComponent({
-      loader: () => import("./pages/Placeholder"),
+      loader: () => import("./pages/user/HomePage"),
       Placeholder: () => <Loading />
-    }),
+    })
   },
   {
     path: "/home/logs",
@@ -87,6 +87,16 @@ export default [
       Placeholder: () => <Loading />
     }),
   },
+
+  {
+    path: "/premium",
+    exact: true,
+    component: asyncComponent({
+      loader: () => import("./pages/Premium"),
+      Placeholder: () => <Loading />
+    }),
+  },
+
   {
     component: asyncComponent({
       loader: () => import("./pages/NotFound"),
