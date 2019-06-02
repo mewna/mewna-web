@@ -22,3 +22,11 @@ export default class extends Component {
     )
   }
 }
+
+export class LoadingSmall extends Component {
+  render() {
+    return (
+      <ReactLoading type="spin" color={BRAND_COLOUR} height={64} width={64} />
+    )
+  }
+}

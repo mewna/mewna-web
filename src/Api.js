@@ -146,9 +146,10 @@ class Api {
   // GUILD DATA //
   ////////////////
 
-  async guildLeaderboard(hostname, guild) {
+  async guildLeaderboard(hostname, guild, after) {
     return await this.request(async () => {
-      const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/leaderboard`)
+      // Absolutely disgusting...
+      const out = await axios.get(`${backendUrl(hostname)}/api/guild/${guild}/leaderboard${after !== undefined ? `?after=${after}` : ""}`)
       return out.data
     })
   }

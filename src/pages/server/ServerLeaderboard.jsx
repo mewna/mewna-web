@@ -7,8 +7,10 @@ import FlexPadder from "../../comp/FlexPadder"
 import Grid, { ProfileGrid, SideGrid } from "../../comp/GridContainer"
 import { SmallIcon } from "../../comp/profile/Icon"
 import { NoPosts } from "../../comp/profile/Post"
+import NavLink from "../../comp/NavLink"
 import { darkBackground, brandBackground, lightBackground } from "../../comp/Utils"
 import lookupBackground from "../../Backgrounds"
+import api from "../../Api"
 import groupBy from "lodash.groupby"
 
 import styled from "@emotion/styled"
@@ -16,7 +18,9 @@ import $ from "../../Translate"
 import Container from "../../comp/Container"
 import storage from "../../Storage"
 import getTheme from "../../Theme"
-import FlexContainer, {DefaultFlexContainer} from "../../comp/FlexContainer"
+import FlexContainer, { DefaultFlexContainer } from "../../comp/FlexContainer"
+import InfiniteScroll from "react-infinite-scroller"
+import { LoadingSmall } from "../../comp/Loading"
 
 const LeaderboardGrid = styled(Grid)`
   width: 100%;
@@ -43,6 +47,28 @@ const RolePill = styled.span`
 `
 
 export default class extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      canLoadMore: true,
+      leaderboard: props.leaderboard
+    }
+  }
+
+  async loadMore(_page) {
+    const nextPage = await api.guildLeaderboard(api.clientHostname(), this.props.cache.guild.id, this.state.leaderboard.length)
+    let newState = {
+      canLoadMore: true,
+      leaderboard: this.state.leaderboard,
+    }
+    if(nextPage === []) {
+      newState.canLoadMore = false
+    } else {
+      newState.leaderboard.push(...nextPage)
+    }
+    this.setState(newState)
+  }
+
   render() {
     return (
       <Container>
@@ -58,9 +84,20 @@ export default class extends Component {
               <p>{$("en_US", "levels.view-rank").replace("$prefix", this.props.prefix)}</p>
             </SideCard>
           </SideGrid>
-          <LeaderboardGrid>
-            {this.renderCards()}
-          </LeaderboardGrid>
+          <InfiniteScroll
+            pageStart={0}
+            loadMore={page => this.loadMore(page)}
+            hasMore={this.state.canLoadMore}
+            loader={
+              <div style={{width: "100%", display: "flex", justifyContent: "center"}}>
+                <LoadingSmall key={"aaaaaaaaaaaaaaaaaaaaaaa"} />
+              </div>
+            }
+            >
+            <LeaderboardGrid>
+              {this.renderCards()}
+            </LeaderboardGrid>
+          </InfiniteScroll>
         </ProfileGrid>
       </Container>
     )
@@ -120,12 +157,16 @@ export default class extends Component {
   }
 
   renderCards() {
-    if(this.props.leaderboard.length === 0) {
+    let leaderboard = this.props.leaderboard
+    if(this.state && this.state.leaderboard) {
+      leaderboard = this.state.leaderboard
+    }
+    if(leaderboard.length === 0) {
       return this.renderNoLevels()
     }
     const cards = []
     let key = 0
-    this.props.leaderboard.forEach(e => {
+    leaderboard.forEach(e => {
       const levelProgress = e.nextLevelXp - e.currentLevelXp - e.xpNeeded
       const levelTotal = e.userXp - e.currentLevelXp + e.xpNeeded
       const background = lookupBackground(e.customBackground)
@@ -136,12 +177,16 @@ export default class extends Component {
           <RankNumber>
             #{e.playerRank}
           </RankNumber>
-          <IconWrapper>
-            <SmallIcon src={e.avatar} alt="avatar" />
-          </IconWrapper>
+          <NavLink to={`/user/${e.accountId}`} nounderline="true">
+            <IconWrapper>
+              <SmallIcon src={e.avatar} alt="avatar" />
+            </IconWrapper>
+          </NavLink>
           <span style={{marginLeft: "0.5em"}} />
           <NameText>
-            <span>{e.name}</span><span>#{e.discrim}</span>
+            <NavLink to={`/user/${e.accountId}`} nounderline="true">
+              <span>{e.name}</span><span>#{e.discrim}</span>
+            </NavLink>
           </NameText>
           <ProgressBarBase>
             <ProgressBarText>
@@ -187,7 +232,7 @@ const RankNumber = styled.div`
   align-items: center;
   align-content: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 4px;
   padding: 0.5em;
   margin-right: 0.5em;
   ${lightBackground}
