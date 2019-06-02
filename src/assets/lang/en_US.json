@@ -103,7 +103,14 @@
     }
   },
   "home": {
-    "no-posts": "None of your servers have posted anything yet..."
+    "no-posts": "None of your servers have posted anything yet...",
+    "no-managed-guilds": "You don't manage any servers that use Mewna.",
+    "no-other-guilds": "None of the other servers you're in use Mewna.",
+    "managed-guilds": "Servers you manage",
+    "other-guilds": "Other servers you're in"
+  },
+  "misc": {
+    "details": "Click to expand / collapse."
   },
   "menu": {
     "docs": "Docs",

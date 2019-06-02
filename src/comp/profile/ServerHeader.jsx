@@ -20,22 +20,26 @@ import { ThreeColGrid } from "../GridContainer"
 import { lightBackground } from "../Utils"
 
 const MewnaModalWrapper = styled.div`
-& > #modal-modalBackground > #modal-modalInner > #modal-modalBody,
-& > #modal-modalBackground > #modal-modalInner > #modal-modalHeader {
-  ${lightBackground}
-}
-
-& > #modal-modalBackground > #modal-modalInner > #modal-modalHeader {
-  border-bottom: 1px solid ${props => props.theme.colors.med} !important;
-}
-
-& > #modal-modalBackground > #modal-modalInner > #modal-modalHeader > #modal-closeButton {
-  color: ${props => props.theme.colors.text} !important;
-
-  :hover {
-    color: ${props => props.theme.colors.text} !important;
+  & > #modal-modalBackground > #modal-modalInner > #modal-modalBody,
+  & > #modal-modalBackground > #modal-modalInner > #modal-modalHeader {
+    ${lightBackground}
   }
-}
+
+  & > #modal-modalBackground > #modal-modalInner > #modal-modalHeader {
+    border-bottom: 1px solid ${props => props.theme.colors.med} !important;
+  }
+
+  & > #modal-modalBackground > #modal-modalInner > #modal-modalHeader > #modal-closeButton {
+    color: ${props => props.theme.colors.text} !important;
+
+    :hover {
+      color: ${props => props.theme.colors.text} !important;
+    }
+  }
+
+  & > #modal-modalBackground > #modal-modalInner {
+    min-height: initial !important;
+  }
 `
 
 const renderSettingsTab = (manages, serverId, currentPath) => {
@@ -145,7 +149,7 @@ class BackgroundModal extends Component {
           <BackgroundGrid>
             {this.renderBackgrounds(defaultBackgrounds)}
           </BackgroundGrid>
-          <PremiumWrapper>
+          {/*<PremiumWrapper>
             <BackgroundGrid>
               {this.renderBackgrounds(premiumBackgrounds, true, this.props.info && this.props.info.premium)}
             </BackgroundGrid>
@@ -156,7 +160,7 @@ class BackgroundModal extends Component {
               {$("en_US", "profile.edit.premium-backgrounds")}
               <Button>Upgrade</Button>
             </PremiumText>
-          </PremiumWrapper>
+          </PremiumWrapper>*/}
         </Modal>
       </MewnaModalWrapper>
     )

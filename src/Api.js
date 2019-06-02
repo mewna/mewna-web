@@ -13,7 +13,7 @@ const axios = Axios.create({
   transformResponse: [
     data => {
       try {
-        const out = msgpack.decode(new Buffer(data))
+        const out = msgpack.decode(Buffer.from(data))
         return out
       } catch(e) {
         console.error(e)
@@ -195,6 +195,13 @@ class Api {
   async getGuilds(hostname) {
     return await this.authRequest(async headers => {
       const out = await axios.get(`${backendUrl(hostname)}/api/auth/guilds/managed`, {headers: headers})
+      return out.data
+    })
+  }
+
+  async getUnmanagedGuilds(hostname) {
+    return await this.authRequest(async headers => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/auth/guilds/unmanaged`, {headers: headers})
       return out.data
     })
   }

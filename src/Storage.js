@@ -84,7 +84,7 @@ export class Storage {
   }
 
   update() {
-    Object.keys(this.listeners).forEach(e => this.listeners[e].updateRender && this.listeners[e].updateRender())
+    Object.keys(this.listeners).forEach(e => this.listeners[e] && this.listeners[e].updateRender && this.listeners[e].updateRender())
   }
 
   _setStore(store) {

@@ -20,9 +20,12 @@ import storage from "../../Storage"
 import mewna from "../../assets/mewna-avatar.png"
 import { lightBackground } from "../../comp/Utils"
 import Loading from "../../comp/Loading"
+import Details from "../../comp/Details"
 
 const SidebarTile = styled.div`
   padding: 1em;
+  padding-left: 1em !important;
+  padding-right: 0 !important;
 `
 const HoverableSidebarTile = styled(SidebarTile)`
   &:hover {
@@ -54,13 +57,15 @@ const ServerTile = withRouter(class extends Component {
   promptOrRedirect() {
     if(this.props.guild.exists) {
       this.props.history.push(`/server/${this.props.guild.id}`)
-    } else {
+    } else if(!this.props.unmanaged) {
       const hostname = api.clientHostname()
       window.open(
         `${backendUrl(hostname)}/api/oauth/addbot/start?guild=${this.props.guild.id}`,
         `Add Mewna to ${this.props.guild.name}`,
         "resizable=no,menubar=no,scrollbars=yes,status=no,height=600,width=400"
       )
+    } else {
+      // TODO: How to notify the user??
     }
   }
 
@@ -69,7 +74,7 @@ const ServerTile = withRouter(class extends Component {
       <HoverableSidebarTile onClick={ev => {
         ev.preventDefault()
         this.promptOrRedirect()
-      }}>
+      }} style={this.props.style || {}}>
         <FlexContainer style={{justifyContent: "inherit"}}>
           <VerySmallIcon src={this.props.guild.icon
             ? `https://cdn.discordapp.com/icons/${this.props.guild.id}/${this.props.guild.icon}.png`
@@ -85,29 +90,31 @@ const ServerTile = withRouter(class extends Component {
 export default class HomePage extends Component {
   static async getInitialProps(ctx) {
     const { req } = ctx
-    const [guilds, user] = await HomePage.fetchData(req.hostname)
+    const [guilds, unmanagedGuilds, user] = await HomePage.fetchData(req.hostname)
     return {
       guilds: guilds,
+      unmanagedGuilds: unmanagedGuilds,
       user: user,
     }
   }
 
   static async fetchData(host) {
-    return await Promise.all([api.getGuilds(host), api.getUser(host, api.userId())])
+    return await Promise.all([api.getGuilds(host), api.getUnmanagedGuilds(host), api.getUser(host, api.userId())])
   }
 
   constructor(props) {
     super(props)
     this.state = {
       guilds: props.guilds || [],
+      unmanagedGuilds: props.unmanagedGuilds || [],
       user: props.user || {},
       forceRerender: false,
     }
   }
 
   async componentDidMount() {
-    const [guilds, user] = await HomePage.fetchData(api.clientHostname())
-    this.setState({guilds: guilds, user: user})
+    const [guilds, unmanagedGuilds, user] = await HomePage.fetchData(api.clientHostname())
+    this.setState({guilds: guilds, unmanagedGuilds: unmanagedGuilds, user: user})
     storage.register(this)
   }
 
@@ -122,11 +129,55 @@ export default class HomePage extends Component {
   renderGuilds() {
     const cards = []
     let key = 0
-    this.state.guilds.forEach(e => {
+    cards.push(
+      <div style={{paddingLeft: "1em"}} key={key++}>
+        <h3>{$("en_US", "home.managed-guilds")}</h3>
+      </div>
+    )
+    if(this.state.guilds.length === 0) {
       cards.push(
-        <ServerTile guild={e} key={key++} />
+        <div style={{paddingLeft: "1em"}} key={key++}>
+          {$("en_US", "home.no-managed-guilds")}
+        </div>
       )
-    })
+    } else {
+      const _cards = []
+      this.state.guilds.forEach(e => {
+        _cards.push(
+          <ServerTile guild={e} key={key++} />
+        )
+      })
+      cards.push(
+        <Details open style={{paddingLeft: "1em"}} key={key++}>
+          {_cards}
+        </Details>
+      )
+    }
+    cards.push(
+      <div style={{paddingLeft: "1em"}} key={key++}>
+        <h3>{$("en_US", "home.other-guilds")}</h3>
+      </div>
+    )
+
+    if(this.state.unmanagedGuilds.filter(e => e.exists).length === 0) {
+      cards.push(
+        <div style={{paddingLeft: "1em"}} key={key++}>
+          {$("en_US", "home.no-other-guilds")}
+        </div>
+      )
+    } else {
+      const _cards = []
+      this.state.guilds.forEach(e => {
+        _cards.push(
+          <ServerTile guild={e} key={key++} unmanaged={true} />
+        )
+      })
+      cards.push(
+        <Details open style={{paddingLeft: "1em"}} key={key++}>
+          {_cards}
+        </Details>
+      )
+    }
     return cards
   }
 
@@ -149,13 +200,15 @@ export default class HomePage extends Component {
         <Container style={{flexDirection: "column"}} fakeProp={this.state.forceRerender}>
           <HiddenMobile style={{marginTop: "4em"}} />
           <ProfileGrid>
-            <SideGrid>
+            <SideGrid style={{gridRowGap: "0.5em"}}>
               <SidebarTile>
                 <FlexContainer style={{justifyContent: "inherit"}}>
                   <VerySmallIcon src={this.state.user.avatar} style={{marginRight: "0.5em", width: "32px", height: "32px"}} /> {this.state.user.displayName}
                 </FlexContainer>
               </SidebarTile>
-              {this.renderGuilds()}
+              <div>
+                {this.renderGuilds()}
+              </div>
             </SideGrid>
             <Grid>
               <NoPosts>
@@ -163,12 +216,6 @@ export default class HomePage extends Component {
               </NoPosts>
             </Grid>
           </ProfileGrid>
-          Homepage props:
-          <pre>
-            <code>
-              {JSON.stringify(this.state, null, 2)}
-            </code>
-          </pre>
         </Container>
       </>
     )
