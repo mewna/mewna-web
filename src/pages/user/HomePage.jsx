@@ -203,7 +203,10 @@ export default class HomePage extends Component {
             <SideGrid style={{gridRowGap: "0.5em"}}>
               <SidebarTile>
                 <FlexContainer style={{justifyContent: "inherit"}}>
-                  <VerySmallIcon src={this.state.user.avatar} style={{marginRight: "0.5em", width: "32px", height: "32px"}} /> {this.state.user.displayName}
+                  <VerySmallIcon src={this.state.user.avatar || this.state.user.discord.avatar}
+                    style={{marginRight: "0.5em", width: "32px", height: "32px"}}
+                    />
+                  {this.state.user.displayName}
                 </FlexContainer>
               </SidebarTile>
               <div>

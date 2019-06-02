@@ -95,9 +95,11 @@ export default withRouter(withToastManager(class extends Component {
               <h4>{$("en_US", "profile.about").replace("$name", this.props.cache.guild.name || "Unknown server")}</h4>
               {this.renderAbout()}
             </SideCard>
+            {/*
             <SideCard>
               <code>guilds.join</code> scope goes here
             </SideCard>
+            */}
           </SideGrid>
           <Grid>
             {this.renderBody()}
