@@ -124,7 +124,7 @@ const ServerPageInternal = withToastManager(class extends Component {
       if(response.errors) {
         error(this, $("en_US", "settings.updates.invalid"))
       } else {
-        this.setState({config: data, rewards: rewards}, async () => callback())
+        this.setState({config: data, rewards: rewards}, async () => callback && callback())
       }
     }
   }

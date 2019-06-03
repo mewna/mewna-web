@@ -1,9 +1,12 @@
 import Cookies from "universal-cookie"
+import { debounce } from "throttle-debounce"
 
 export class Storage {
   constructor() {
     this.cookies = new Cookies()
     this.listeners = []
+    // We debounce the update function mainly just so that we can avoid loops
+    this.update = debounce(500, false, () => this.updateRender())
   }
   
   // Permanent storage //
@@ -83,7 +86,7 @@ export class Storage {
     this.listeners = this.listeners.filter(e => e !== x)
   }
 
-  update() {
+  updateRender() {
     Object.keys(this.listeners).forEach(e => this.listeners[e] && this.listeners[e].updateRender && this.listeners[e].updateRender())
   }
 

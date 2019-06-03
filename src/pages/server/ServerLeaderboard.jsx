@@ -19,7 +19,7 @@ import Container from "../../comp/Container"
 import storage from "../../Storage"
 import getTheme from "../../Theme"
 import FlexContainer, { DefaultFlexContainer } from "../../comp/FlexContainer"
-import InfiniteScroll from "react-infinite-scroller"
+import InfiniteScroll from "react-infinite-scroll-component"
 import { LoadingSmall } from "../../comp/Loading"
 
 const LeaderboardGrid = styled(Grid)`
@@ -55,7 +55,7 @@ export default class extends Component {
     }
   }
 
-  async loadMore(_page) {
+  async loadMore() {
     const nextPage = await api.guildLeaderboard(api.clientHostname(), this.props.cache.guild.id, this.state.leaderboard.length)
     let newState = {
       canLoadMore: true,
@@ -85,8 +85,10 @@ export default class extends Component {
             </SideCard>
           </SideGrid>
           <InfiniteScroll
+            style={{overflow: "hidden"}}
+            dataLength={this.state.leaderboard.length}
             pageStart={0}
-            loadMore={page => this.loadMore(page)}
+            next={() => this.loadMore()}
             hasMore={this.state.canLoadMore}
             loader={
               <div style={{width: "100%", display: "flex", justifyContent: "center"}}>
