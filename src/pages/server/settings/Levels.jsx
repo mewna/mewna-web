@@ -14,6 +14,7 @@ import { withToastManager } from 'react-toast-notifications'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 import $ from "../../../Translate"
+import api from "../../../Api"
 import { toggleState, success } from "../../../Utils"
 import { LevelsFormat } from "./Formats"
 import DeleteButton from "../../../comp/DeleteButton"
@@ -24,6 +25,13 @@ for(let i = 1; i <= 100; i++) {
 }
 
 export default withToastManager(class extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      fakeMee6ImportFinished: false,
+    }
+  }
+
   render() {
     //const everyone = this.props.cache.roles
     //  .filter(e => e.name === "@everyone")
@@ -104,9 +112,7 @@ export default withToastManager(class extends Component {
               <p>
                 {$("en_US", "settings.desc.levels.mee6-import.2")}
               </p>
-              <InternalWidthFixer>
-                <PaddedButton>Import</PaddedButton>
-              </InternalWidthFixer>
+              {this.renderMee6ImportButton()}
             </PaddedCard>
           </TwoColGrid>
         </GridContainer>
@@ -177,6 +183,34 @@ export default withToastManager(class extends Component {
         </GridContainer>
       </>
     )
+  }
+
+  renderMee6ImportButton() {
+    if(this.props.config.levels.mee6LevelsImported || this.state.fakeMee6ImportFinished) {
+      return (
+        <div>
+          {$("en_US", "settings.desc.levels.mee6-import.already-imported")}
+        </div>
+      )
+    } else {
+      return (
+        <InternalWidthFixer onClick={e => this.runMee6Import(e)}>
+          <PaddedButton>Import</PaddedButton>
+        </InternalWidthFixer>
+      )
+    }
+  }
+
+  async runMee6Import(e) {
+    e.preventDefault()
+    // TODO: Actually run the import.....
+    await api.importMee6Levels(api.clientHostname(), this.props.cache.guild.id)
+    success(
+      this,
+      $("en_US", "settings.updates.big-update")
+        .replace("$setting", "Level-up message")
+    )
+    this.setState({fakeMee6ImportFinished: true})
   }
 
   renderRoleRewards() {

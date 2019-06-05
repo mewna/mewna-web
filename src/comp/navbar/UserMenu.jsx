@@ -100,27 +100,32 @@ class UserMenu extends Component {
           <NavMenuButton onClick={() => this.toggleTheme()} nounderline="true">
             {$("en_US", "menu.toggle-theme")}
           </NavMenuButton>
-          <NavMenuButton>
-              <NavLink nounderline="true" to={`/user/${this.props.user.id}`}>
-                {$("en_US", "menu.my-profile")}
-              </NavLink>
+          <NavLink nounderline="true" to={`/user/${this.props.user.id}`}>
+            <NavMenuButton>
+              {$("en_US", "menu.my-profile")}
             </NavMenuButton>
+          </NavLink>
+          <NavLink nounderline="true" to="/home">
+            <NavMenuButton>
+              {$("en_US", "menu.my-servers")}
+            </NavMenuButton>
+          </NavLink>
           <HiddenDesktop style={{display: "flex", flexDirection: "column"}}>
-            <NavMenuButton>
-              <NavLink nounderline="true" to="/docs">
+            <NavLink nounderline="true" to="/docs">
+              <NavMenuButton>
                 {$("en_US", "menu.docs")}
-              </NavLink>
-            </NavMenuButton>
-            <NavMenuButton>
-              <NavLink nounderline="true" to="/">
+              </NavMenuButton>
+            </NavLink>
+            <NavLink nounderline="true" to="/">
+              <NavMenuButton>
               {$("en_US", "menu.premium")}
-              </NavLink>
-            </NavMenuButton>
-            <NavMenuButton>
-              <ExternalLink nounderline="true" href="https://discord.gg/UwdDN6r" target="_blank" rel="noopener noreferrer">
+              </NavMenuButton>
+            </NavLink>
+            <ExternalLink nounderline="true" href="https://discord.gg/UwdDN6r" target="_blank" rel="noopener noreferrer">
+              <NavMenuButton>
               {$("en_US", "menu.community")}
-              </ExternalLink>
-            </NavMenuButton>
+              </NavMenuButton>
+            </ExternalLink>
           </HiddenDesktop>
           <NavMenuButton onClick={() => this.logout()} nounderline="true">Log out</NavMenuButton>
         </Menu>

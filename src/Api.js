@@ -79,12 +79,24 @@ class Api {
   //////////////////////
 
   async heartbeat(hostname) {
+    if(this.token() === null) {
+      // This is The Magic Function(tm) that will check if your token is valid
+      // and clear out your session if it's not. However, if we have an invalid
+      // token, this function clears it, and it gets caught in a loop because
+      // of this. Because of that, we can just return nothing in the case of 
+      // having no token, because things should handle that correctly. 
+      return null
+    }
     return await this.authRequest(async headers => {
       try {
         const out = await axios.get(`${backendUrl(hostname)}/api/auth/heartbeat`, {headers: headers})
         return out.data
       } catch(e) {
-        storage.setToken(null)
+        if(typeof window !== "undefined") {
+          storage.setToken(null, window.location.hostname)
+        } else {
+          storage.setToken(null)
+        }
       }
     })
   }
@@ -138,6 +150,13 @@ class Api {
   async deleteGuildWebhook(hostname, guild, webhook) {
     return await this.authRequest(async headers => {
       const out = await axios.delete(`${backendUrl(hostname)}/api/guild/${guild}/webhooks/${webhook}`, {headers: headers})
+      return out.data
+    })
+  }
+
+  async importMee6Levels(hostname, guild) {
+    return await this.authRequest(async headers => {
+      const out = await axios.post(`${backendUrl(hostname)}/api/guild/${guild}/levels/import/mee6`, {headers: headers})
       return out.data
     })
   }
@@ -249,6 +268,13 @@ class Api {
   async getPosts(hostname, id) {
     return await this.request(async () => {
       const out = await axios.get(`${backendUrl(hostname)}/api/post/${id}/posts`)
+      return out.data
+    })
+  }
+
+  async getHomepage(hostname) {
+    return await this.authRequest(async headers => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/auth/homepage`, {headers: headers})
       return out.data
     })
   }

@@ -20,10 +20,9 @@ export class Storage {
     if(host) {
       finalHost = host
     } else {
-      finalHost = typeof window !== "undefined" ? window.location.host : null
+      finalHost = typeof window !== "undefined" ? window.location.hostname : null
     }
-    const res = this.cookies.set(key, value, { path: "/", domain: finalHost })
-    return res
+    return this.cookies.set(key, value, { path: "/", domain: finalHost })
   }
 
   // Listeners //

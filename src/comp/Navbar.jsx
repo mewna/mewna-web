@@ -36,7 +36,7 @@ const Bar = styled.div`
   }
 `
 const NavTitle = styled.div`
-  font-size: 2.5em;
+  font-size: 2.25em;
 `
 const NavItem = styled.div`
   height: ${BAR_HEIGHT};
@@ -82,7 +82,7 @@ export default class Navbar extends Component {
         <Container>
           <NavTitle>
             <NavLink nounderline="true" to="/">
-              Mewna!<small style={{fontSize: "0.4em"}}>alpha</small>
+              Mewna!<HiddenMobile style={{display: "inline-block"}}><small style={{fontSize: "0.4em"}}>alpha</small></HiddenMobile>
             </NavLink>
           </NavTitle>
           <FlexPadder />

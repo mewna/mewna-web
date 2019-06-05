@@ -50,7 +50,8 @@
       "levels": {
         "mee6-import": {
           "1": "Import this server's levels and role rewards from MEE6. This overwrites old levels and cannot be undone. This may take several minutes to run.",
-          "2": "Your levels will not be exactly the same, because Mewna's level calculation is somewhat different from MEE6's, but the amount of exp you have will be the same."
+          "2": "Your levels will not be exactly the same, because Mewna's level calculation is somewhat different from MEE6's, but the amount of exp you have will be the same.",
+          "already-imported": "This server's MEE6 levels have already been imported."
         },
         "role-chooser": "Select a role from the dropdown to add it as a reward.",
         "level": "Level"
@@ -117,6 +118,7 @@
     "premium": "Premium",
     "community": "Community",
     "my-profile": "My profile",
+    "my-servers": "My servers",
     "toggle-theme": "Toggle light theme",
     "logout": "Log out"
   },

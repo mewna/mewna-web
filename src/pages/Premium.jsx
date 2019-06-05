@@ -16,11 +16,12 @@ export default class extends Component {
           <ul>
             <li>upload bg image</li>
             <li>personal prefixes</li>
-            <li>hats?</li>
-            <li>expanded highlight</li>
+            <li>~~hats?~~</li>
+            <li>~~expanded highlight~~</li>
             <li>profile/rank card badge</li>
             <li>shiny role in mewna guild (yarn)</li>
             <li>bonus to :white_flower:</li>
+            <li>mew.daily autocollection</li>
           </ul>
         </Container>
       </>

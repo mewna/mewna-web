@@ -19,7 +19,7 @@ import Container from "../../comp/Container"
 import storage from "../../Storage"
 import getTheme from "../../Theme"
 import FlexContainer, { DefaultFlexContainer } from "../../comp/FlexContainer"
-import InfiniteScroll from "react-infinite-scroll-component"
+import InfiniteScroll from "react-infinite-scroller"
 import { LoadingSmall } from "../../comp/Loading"
 
 const LeaderboardGrid = styled(Grid)`
@@ -61,7 +61,7 @@ export default class extends Component {
       canLoadMore: true,
       leaderboard: this.state.leaderboard,
     }
-    if(nextPage === []) {
+    if(nextPage.length === 0) {
       newState.canLoadMore = false
     } else {
       newState.leaderboard.push(...nextPage)
@@ -85,14 +85,12 @@ export default class extends Component {
             </SideCard>
           </SideGrid>
           <InfiniteScroll
-            style={{overflow: "hidden"}}
-            dataLength={this.state.leaderboard.length}
             pageStart={0}
-            next={() => this.loadMore()}
+            loadMore={() => this.loadMore()}
             hasMore={this.state.canLoadMore}
             loader={
-              <div style={{width: "100%", display: "flex", justifyContent: "center"}}>
-                <LoadingSmall key={"aaaaaaaaaaaaaaaaaaaaaaa"} />
+              <div key={"aaaaaaaaaaaaaaaaaaaaaaa"} style={{width: "100%", display: "flex", justifyContent: "center"}}>
+                <LoadingSmall />
               </div>
             }
             >
