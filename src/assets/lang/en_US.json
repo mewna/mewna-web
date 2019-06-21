@@ -57,7 +57,7 @@
         "level": "Level"
       },
       "notifications": {
-        "webhooks": "Webhooks are used to send Twitch stream notifications and server blog post notifications to your server.",
+        "webhooks": "Webhooks are used to send Twitch stream alerts to your server.",
         "twitch": "Type a name in the search box to search for a Twitch streamer to add."
       }
     }
@@ -121,6 +121,14 @@
     "my-servers": "My servers",
     "toggle-theme": "Toggle light theme",
     "logout": "Log out"
+  },
+  "premium": {
+    "user": {
+      "personal-prefixes": {
+        "1": "Personal prefixes are custom prefixes that will work for you across all servers.",
+        "2": "You can have up to 5 personal prefixes."
+      }
+    }
   },
   "commands": {
     "economy": {

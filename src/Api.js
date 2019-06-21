@@ -30,6 +30,8 @@ const axios = Axios.create({
   }
 })
 
+const axiex = Axios.create()
+
 class Api {
   /////////////
   // HELPERS //
@@ -226,6 +228,13 @@ class Api {
     })
   }
 
+  async getPremiumSettings(hostname) {
+    return await this.authRequest(async headers => {
+      const out = await axios.get(`${backendUrl(hostname)}/api/auth/premium`, {headers: headers})
+      return out.data
+    })
+  }
+
   ///////////
   // POSTS //
   ///////////
@@ -317,7 +326,7 @@ class Api {
 
   async twitchName(name) {
     return await this.request(async () => {
-      const out = await axios.get(`https://api.twitch.tv/helix/users?login=${name}`, {
+      const out = await axiex.get(`https://api.twitch.tv/helix/users?login=${name}`, {
         headers: {
           "Client-ID": twitchClientId,
         }
@@ -328,11 +337,12 @@ class Api {
 
   async twitchId(id) {
     return await this.request(async () => {
-      const out = await axios.get(`https://api.twitch.tv/helix/users?id=${e.id}`, {
+      const out = await axiex.get(`https://api.twitch.tv/helix/users?id=${id}`, {
         headers: {
           "Client-ID": twitchClientId,
         }
       })
+      console.log("Twitch =>", out)
       return out.data
     })
   }

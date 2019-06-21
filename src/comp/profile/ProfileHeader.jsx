@@ -23,22 +23,22 @@ import DebouncedTextbox from "../DebouncedTextbox"
 import mewna from "../../assets/mewna-avatar.png"
 
 const MewnaModalWrapper = styled.div`
-& > #modal-modalBackground > #modal-modalInner > #modal-modalBody,
-& > #modal-modalBackground > #modal-modalInner > #modal-modalHeader {
-  ${lightBackground}
-}
-
-& > #modal-modalBackground > #modal-modalInner > #modal-modalHeader {
-  border-bottom: 1px solid ${props => props.theme.colors.med} !important;
-}
-
-& > #modal-modalBackground > #modal-modalInner > #modal-modalHeader > #modal-closeButton {
-  color: ${props => props.theme.colors.text} !important;
-
-  :hover {
-    color: ${props => props.theme.colors.text} !important;
+  & > #modal-modalBackground > #modal-modalInner > #modal-modalBody,
+  & > #modal-modalBackground > #modal-modalInner > #modal-modalHeader {
+    ${lightBackground}
   }
-}
+
+  & > #modal-modalBackground > #modal-modalInner > #modal-modalHeader {
+    border-bottom: 1px solid ${props => props.theme.colors.med} !important;
+  }
+
+  & > #modal-modalBackground > #modal-modalInner > #modal-modalHeader > #modal-closeButton {
+    color: ${props => props.theme.colors.text} !important;
+
+    :hover {
+      color: ${props => props.theme.colors.text} !important;
+    }
+  }
 `
 
 const BackgroundGrid = styled(ThreeColGrid)`

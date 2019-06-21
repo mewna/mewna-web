@@ -55,6 +55,9 @@ const Arrow = styled.div`
   border-top: ${props => props.expanded ? "none" : `5px solid ${props.theme.colors.text}`};
   border-bottom: ${props => props.expanded ? `5px solid ${props.theme.colors.text}` : "none"};
 `
+const PremiumButton = styled(NavMenuButton)`
+  color: ${props => props.theme.colors.brand};
+`
 
 class UserMenu extends Component {
   constructor(props) {
@@ -93,6 +96,21 @@ class UserMenu extends Component {
     store.setToken(null, window.location.hostname)
   }
 
+  renderPremiumButton() {
+    if(this.props.account.premium) {
+      return (
+        <PremiumButton onClick={e => {
+          e.preventDefault()
+          this.props.openPremiumSettings && this.props.openPremiumSettings()
+        }}>
+          Premium Settings
+        </PremiumButton>
+      )
+    } else {
+      return ""
+    }
+  }
+
   renderMenu() {
     if(this.state.expanded) {
       return (
@@ -110,6 +128,7 @@ class UserMenu extends Component {
               {$("en_US", "menu.my-servers")}
             </NavMenuButton>
           </NavLink>
+          {this.renderPremiumButton()}
           <HiddenDesktop style={{display: "flex", flexDirection: "column"}}>
             <NavLink nounderline="true" to="/docs">
               <NavMenuButton>
@@ -118,12 +137,12 @@ class UserMenu extends Component {
             </NavLink>
             <NavLink nounderline="true" to="/">
               <NavMenuButton>
-              {$("en_US", "menu.premium")}
+                {$("en_US", "menu.premium")}
               </NavMenuButton>
             </NavLink>
             <ExternalLink nounderline="true" href="https://discord.gg/UwdDN6r" target="_blank" rel="noopener noreferrer">
               <NavMenuButton>
-              {$("en_US", "menu.community")}
+                {$("en_US", "menu.community")}
               </NavMenuButton>
             </ExternalLink>
           </HiddenDesktop>

@@ -29,6 +29,25 @@ export default withToastManager(class extends Component {
     }
   }
 
+  async componentDidMount() {
+    const cache = this.state.cache || {}
+    for(const e of this.props.config.twitch.twitchStreamers) {
+      if(!this.state.cache[e.id]) {
+        const results = await api.twitchId(e.id)
+        console.log(e.id, "=>", results)
+        const cache = this.state.cache
+        cache[e.id] = results.data.map(e => ({
+          value: e.id,
+          label: e.display_name,
+          icon: e.profile_image_url,
+          login: e.login,
+        }))[0]
+      }
+    }
+    this.setState({cache: cache})
+    console.log("Patching streamer cache =>", cache)
+  }
+
   createOAuthDialog(e) {
     e.preventDefault()
     if (typeof window !== undefined) {
@@ -157,18 +176,18 @@ export default withToastManager(class extends Component {
   renderTwitchStreamers() {
     const cards = []
     let key = 0
-    this.props.config.twitch.twitchStreamers.filter(e => !this.state.cache[e.id])
-      .forEach(async e => {
-        const results = await api.twitchId(e.id)
-        const cache = this.state.cache
-        cache[e.id] = results.data.map(e => ({
-          value: e.id,
-          label: e.display_name,
-          icon: e.profile_image_url,
-          login: e.login,
-        }))[0]
-        this.setState({cache: cache})
+    if(typeof window === "undefined") {
+      this.props.config.twitch.twitchStreamers.forEach(_ => {
+        cards.push(
+          <PaddedCard key={key++}>
+            <FlexContainer>
+              LOADING...
+            </FlexContainer>
+          </PaddedCard>
+        )
       })
+      return cards
+    }
     this.props.config.twitch.twitchStreamers.forEach(streamer => {
       if(this.state.cache[streamer.id]) {
         const cached = this.state.cache[streamer.id]
